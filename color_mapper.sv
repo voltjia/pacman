@@ -13,11 +13,24 @@
 //-------------------------------------------------------------------------
 
 
-module color_mapper(input        [9:0] draw_x, draw_y,
+module color_mapper(input  logic       blank,
+                    input  logic [9:0] draw_x, draw_y,
                     output logic [7:0] red, green, blue);
 
-	 assign red = 8'h00; 
-    assign green = 8'h00;
-    assign blue = 8'h7f - draw_x[9:3];
-    
+   always_comb
+   begin
+      if (~blank)
+         begin
+            red = 8'h00;
+            green = 8'h00;
+            blue = 8'h00;
+         end
+      else
+         begin
+            red = 8'hff;
+            green = 8'h55;
+            blue = 8'h00;
+         end
+   end
+
 endmodule
