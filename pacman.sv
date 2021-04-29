@@ -28,7 +28,7 @@ module pacman (input         MAX10_CLK1_50,
                inout         ARDUINO_RESET_N);
 
    logic         reset, blank, sync;
-   logic [7:0]   pixel_red, pixel_green, pixel_blue;
+   logic [3:0]   pixel_red, pixel_green, pixel_blue;
    logic [9:0]   pixel_x, pixel_y;
    logic [31:0]  control;
    logic [31:0]  gpio_0_in, gpio_0_out;
@@ -46,9 +46,9 @@ module pacman (input         MAX10_CLK1_50,
    assign HEX1 = 8'b10001000;  // A
    assign HEX0 = 8'b11000110;  // C
 
-   assign VGA_R = pixel_red[7:4];
-   assign VGA_G = pixel_green[7:4];
-   assign VGA_B = pixel_blue[7:4];
+   assign VGA_R = pixel_red;
+   assign VGA_G = pixel_green;
+   assign VGA_B = pixel_blue;
 
    /*
    hex_driver hex_driver5 (.in(sdram_pixel_address[23:20]), .out(HEX5));

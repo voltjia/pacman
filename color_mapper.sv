@@ -2,35 +2,24 @@ module color_mapper (input  logic        clk,
                      input  logic        blank,
                      input  logic [9:0]  x, y,
                      input  logic [31:0] control,
-                     output logic [7:0]  red, green, blue);
+                     output logic [3:0]  red, green, blue);
 
-   logic load;
    logic [7:0] index;
-   logic [31:0] rgba;
-   logic [31:0] rgba0;
-   logic [31:0] rgba1;
-   logic [8191:0] rgbas;
-   logic [9599:0] mask;
-   logic [9599:0] indices_in;
-   logic [9599:0] indices_out;
+   logic [11:0] rgb;
+   logic [11:0] pallete [256][16];
+   logic [3:0] pixels [256][256];
+   logic [7:0] indices [1200];
 
-   assign position = (control[21:16] * 40 + control[27:22]) * 8;
-   assign rgbas = { {254{32'hFFFFFFFF}}, rgba1[31:0], rgba0[31:0] };
-
-   shift_register #(.N(9600)) shift_register (
-      .clk(clk),
-      .shift_enable(0),
-      .load(load),
-      .data_in(indices_in),
-      .data_out(indices_out));
-
+   assign index = indices[(y / 16) * 40 + x / 16];
+   assign rgb = pallete[index][pixels[index][(y % 16) * 16 + x % 16]];
+   /*
    sprite sprite0 (
       .clk(clk),
       .x(x % 16),
       .y(y % 16),
       .index(0),
       .control(control),
-      .rgba(rgba0));
+      .rgb(rgbs[0]));
 
    sprite sprite1 (
       .clk(clk),
@@ -38,47 +27,77 @@ module color_mapper (input  logic        clk,
       .y(y % 16),
       .index(1),
       .control(control),
-      .rgba(rgba1));
+      .rgb(rgbs[1]));
 
-   mux960028 mux960028 (
-      .data_in(indices_out),
-      .select((y / 16) * 40 + x / 16),
-      .data_out(index));
+   sprite sprite2 (
+      .clk(clk),
+      .x(x % 16),
+      .y(y % 16),
+      .index(2),
+      .control(control),
+      .rgb(rgbs[2]));
 
-   mux8192232 mux8192232 (
-      .data_in(rgbas),
-      .select(index),
-      .data_out(rgba));
+   sprite sprite3 (
+      .clk(clk),
+      .x(x % 16),
+      .y(y % 16),
+      .index(3),
+      .control(control),
+      .rgb(rgbs[3]));
 
-   mask_generator #(.N(9600)) mask_generator (
-      .position(position),
-      .length(8),
-      .mask(mask));
+   sprite sprite4 (
+      .clk(clk),
+      .x(x % 16),
+      .y(y % 16),
+      .index(4),
+      .control(control),
+      .rgb(rgbs[4]));
 
+   sprite sprite5 (
+      .clk(clk),
+      .x(x % 16),
+      .y(y % 16),
+      .index(5),
+      .control(control),
+      .rgb(rgbs[5]));
+
+   sprite sprite6 (
+      .clk(clk),
+      .x(x % 16),
+      .y(y % 16),
+      .index(6),
+      .control(control),
+      .rgb(rgbs[6]));
+
+   sprite sprite7 (
+      .clk(clk),
+      .x(x % 16),
+      .y(y % 16),
+      .index(7),
+      .control(control),
+      .rgb(rgbs[7]));
+   */
    always_ff @ (posedge clk)
    begin
-      if (control[31:28] == 4'h2)
-         begin
-            load <= 1;
-            indices_in <= (indices_out & ~mask) | (control[7:0] << position);
-         end
-      else
-         load <= 0;
+      if (control[31:28] == 4'h1)
+         pixels[control[27:20]][control[15:12] * 16 + control[19:16]] <= control[11:0];
+      else if (control[31:28] == 4'h2)
+         indices[control[21:16] * 40 + control[27:22]] <= control[7:0];
    end
 
    always_comb
    begin
       if (~blank)
          begin
-            red = 8'h00;
-            green = 8'h00;
-            blue = 8'h00;
+            red = 4'h0;
+            green = 4'h0;
+            blue = 4'h0;
          end
       else
          begin
-            red = rgba[31:24];
-            green = rgba[23:16];
-            blue = rgba[15:8];
+            red = rgb[11:8];
+            green = rgb[7:4];
+            blue = rgb[3:0];
          end
    end
 

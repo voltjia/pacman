@@ -146,7 +146,7 @@ C_SRCS += main.c
 C_SRCS += usb_kb/HID.c
 C_SRCS += usb_kb/MAX3421E.c
 C_SRCS += usb_kb/transfer.c
-C_SRCS += vga_driver.c
+C_SRCS += spu.c
 CXX_SRCS :=
 ASM_SRCS :=
 
