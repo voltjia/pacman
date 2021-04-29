@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "sprite_sheet.h"
+#include "spu.h"
 #include "system.h"
 #include "altera_avalon_spi.h"
 #include "altera_avalon_spi_regs.h"
@@ -21,19 +21,13 @@ void spu_control(int instruction)
 int main()
 {
 	printf("PacPac\n");
-	spu_set_sprite(0, yellow_pacman_sprite);
-	spu_set_sprite(1, red_ghost_sprite);
-	for (int y = 0; y < 30; ++y) {
-		for (int x = 0; x < 40; ++x) {
-			spu_set_map(x, y, 0);
+	int map[1200] = {0};
+	int count = 0;
+	for (int y = 0; y < SPU_MAP_HEIGHT; ++y) {
+		for (int x = 0; x < SPU_MAP_WIDTH; ++x) {
+			map[y * SPU_MAP_WIDTH + x] = (count++) % 49;
 		}
 	}
-	for (int i = 0; i < 16; ++i) {
-		if (i != 0) {
-			spu_set_map(i - 1, 19, 0);
-		}
-		spu_set_map(i, 19, 1);
-		for (int j = 0; j < 65536; ++j) {}
-	}
+	spu_set_map(map);
 	return 0;
 }

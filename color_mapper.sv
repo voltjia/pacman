@@ -6,83 +6,22 @@ module color_mapper (input  logic        clk,
 
    logic [7:0] index;
    logic [11:0] rgb;
-   logic [11:0] pallete [256][16];
-   logic [3:0] pixels [256][256];
+   logic [11:0] pallete [16];
+   logic [3:0] pixels [65536];
    logic [7:0] indices [1200];
 
    assign index = indices[(y / 16) * 40 + x / 16];
-   assign rgb = pallete[index][pixels[index][(y % 16) * 16 + x % 16]];
-   /*
-   sprite sprite0 (
-      .clk(clk),
-      .x(x % 16),
-      .y(y % 16),
-      .index(0),
-      .control(control),
-      .rgb(rgbs[0]));
+   assign rgb = pallete[pixels[index * 256 + (y % 16) * 16 + x % 16]];
 
-   sprite sprite1 (
-      .clk(clk),
-      .x(x % 16),
-      .y(y % 16),
-      .index(1),
-      .control(control),
-      .rgb(rgbs[1]));
+   initial
+   begin
+      $readmemh("pallete.txt", pallete);
+      $readmemh("pacman.txt", pixels);
+   end
 
-   sprite sprite2 (
-      .clk(clk),
-      .x(x % 16),
-      .y(y % 16),
-      .index(2),
-      .control(control),
-      .rgb(rgbs[2]));
-
-   sprite sprite3 (
-      .clk(clk),
-      .x(x % 16),
-      .y(y % 16),
-      .index(3),
-      .control(control),
-      .rgb(rgbs[3]));
-
-   sprite sprite4 (
-      .clk(clk),
-      .x(x % 16),
-      .y(y % 16),
-      .index(4),
-      .control(control),
-      .rgb(rgbs[4]));
-
-   sprite sprite5 (
-      .clk(clk),
-      .x(x % 16),
-      .y(y % 16),
-      .index(5),
-      .control(control),
-      .rgb(rgbs[5]));
-
-   sprite sprite6 (
-      .clk(clk),
-      .x(x % 16),
-      .y(y % 16),
-      .index(6),
-      .control(control),
-      .rgb(rgbs[6]));
-
-   sprite sprite7 (
-      .clk(clk),
-      .x(x % 16),
-      .y(y % 16),
-      .index(7),
-      .control(control),
-      .rgb(rgbs[7]));
-   */
    always_ff @ (posedge clk)
    begin
-      if (control[31:28] == 4'h1)
-         pixels[control[27:20]][control[15:12] * 16 + control[19:16]] <= control[11:0];
-      else if (control[31:28] == 4'h2)
-         indices[control[21:16] * 40 + control[27:22]] <= control[7:0];
+      indices[control[13:8] * 40 + control[19:14]] <= control[7:0];
    end
 
    always_comb
