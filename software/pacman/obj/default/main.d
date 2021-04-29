@@ -1,4 +1,4 @@
-obj/default/main.o: main.c vga_driver.h ../pacman_bsp/system.h \
+obj/default/main.o: main.c sprite_sheet.h ../pacman_bsp/system.h \
  ../pacman_bsp/linker.h ../pacman_bsp//drivers/inc/altera_avalon_spi.h \
  ../pacman_bsp//HAL/inc/alt_types.h \
  ../pacman_bsp//drivers/inc/altera_avalon_spi_regs.h \
@@ -8,7 +8,7 @@ obj/default/main.o: main.c vga_driver.h ../pacman_bsp/system.h \
  usb_kb/GenericMacros.h usb_kb/GenericTypeDefs.h usb_kb/HID.h \
  usb_kb/MAX3421E.h usb_kb/transfer.h usb_kb/usb_ch9.h usb_kb/USB.h
 
-vga_driver.h:
+sprite_sheet.h:
 
 ../pacman_bsp/system.h:
 

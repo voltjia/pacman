@@ -15,7 +15,7 @@ module mux421 (input [3:0]  data_in,
    end
 
 endmodule
-
+/*
 module mux81922512 (input [8191:0]       data_in,
                     input [3:0]          select,
                     output logic [511:0] data_out);
@@ -110,7 +110,7 @@ module mux8192232 (input [8191:0]      data_in,
    mux512232 mux1(.data_in(horizontal), .select(select % 16), .data_out(data_out));
 
 endmodule
-
+*/
 module mux96002320 (input [9599:0]       data_in,
                     input [5:0]          select,
                     output logic [319:0] data_out);
@@ -279,5 +279,100 @@ module mux960028 (input [9599:0]     data_in,
 
    mux96002320 mux0 (.data_in(data_in), .select(select / 40), .data_out(horizontal));
    mux32028 mux1(.data_in(horizontal), .select(select % 40), .data_out(data_out));
+
+endmodule
+
+module mux30722192 (input [3071:0]       data_in,
+                    input [3:0]          select,
+                    output logic [191:0] data_out);
+
+   always_comb
+   begin
+      if (select == 4'h0)
+         data_out = data_in[192*1-1:192*0];
+      else if (select == 4'h1)
+         data_out = data_in[192*2-1:192*1];
+      else if (select == 4'h2)
+         data_out = data_in[192*3-1:192*2];
+      else if (select == 4'h3)
+         data_out = data_in[192*4-1:192*3];
+      else if (select == 4'h4)
+         data_out = data_in[192*5-1:192*4];
+      else if (select == 4'h5)
+         data_out = data_in[192*6-1:192*5];
+      else if (select == 4'h6)
+         data_out = data_in[192*7-1:192*6];
+      else if (select == 4'h7)
+         data_out = data_in[192*8-1:192*7];
+      else if (select == 4'h8)
+         data_out = data_in[192*9-1:192*8];
+      else if (select == 4'h9)
+         data_out = data_in[192*10-1:192*9];
+      else if (select == 4'ha)
+         data_out = data_in[192*11-1:192*10];
+      else if (select == 4'hb)
+         data_out = data_in[192*12-1:192*11];
+      else if (select == 4'hc)
+         data_out = data_in[192*13-1:192*12];
+      else if (select == 4'hd)
+         data_out = data_in[192*14-1:192*13];
+      else if (select == 4'he)
+         data_out = data_in[192*15-1:192*14];
+      else
+         data_out = data_in[192*16-1:192*15];
+   end
+
+endmodule
+
+module mux192212 (input [511:0]       data_in,
+                  input [3:0]         select,
+                  output logic [31:0] data_out);
+
+   always_comb
+   begin
+      if (select == 4'h0)
+         data_out = data_in[12*1-1:12*0];
+      else if (select == 4'h1)
+         data_out = data_in[12*2-1:12*1];
+      else if (select == 4'h2)
+         data_out = data_in[12*3-1:12*2];
+      else if (select == 4'h3)
+         data_out = data_in[12*4-1:12*3];
+      else if (select == 4'h4)
+         data_out = data_in[12*5-1:12*4];
+      else if (select == 4'h5)
+         data_out = data_in[12*6-1:12*5];
+      else if (select == 4'h6)
+         data_out = data_in[12*7-1:12*6];
+      else if (select == 4'h7)
+         data_out = data_in[12*8-1:12*7];
+      else if (select == 4'h8)
+         data_out = data_in[12*9-1:12*8];
+      else if (select == 4'h9)
+         data_out = data_in[12*10-1:12*9];
+      else if (select == 4'ha)
+         data_out = data_in[12*11-1:12*10];
+      else if (select == 4'hb)
+         data_out = data_in[12*12-1:12*11];
+      else if (select == 4'hc)
+         data_out = data_in[12*13-1:12*12];
+      else if (select == 4'hd)
+         data_out = data_in[12*14-1:12*13];
+      else if (select == 4'he)
+         data_out = data_in[12*15-1:12*14];
+      else
+         data_out = data_in[12*16-1:12*15];
+   end
+
+endmodule
+
+module mux3072212 (input [3071:0]      data_in,
+                   input [7:0]         select,
+                   output logic [11:0] data_out);
+
+   logic [191:0] horizontal;
+
+   mux30722192 mux0 (.data_in(data_in), .select(select / 16), .data_out(horizontal));
+   mux192212 mux1(.data_in(horizontal), .select(select % 16), .data_out(data_out));
 
 endmodule
