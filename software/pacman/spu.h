@@ -60,10 +60,26 @@
 #define GHOST_EYES_SPRITE_DOWN       46
 #define GHOST_EYES_SPRITE_LEFT       47
 #define GHOST_EYES_SPRITE_RIGHT      48
-
+#define BIG_FOOD_SPRITE              49
+#define SMALL_FOOD_SPRITE            50
+#define HORIZONTAL_WALL_SPRITE       51
+#define VERTICAL_WALL_SPRITE         52
+#define CROSS_WALL_SPRITE            53
+#define T_WALL_SPRITE_UP             54
+#define T_WALL_SPRITE_DOWN           55
+#define T_WALL_SPRITE_LEFT           56
+#define T_WALL_SPRITE_RIGHT          57
+#define TOP_LEFT_WALL_SPRITE         58
+#define TOP_RIGHT_WALL_SPRITE        59
+#define BOTTOM_LEFT_WALL_SPRITE      60
+#define BOTTOM_RIGHT_WALL_SPRITE     61
+#define PAC_MAN_GAME_SPRITE_COUNT    62
 
 void spu_control(int instruction);
+void spu_show_all_sprites();
+void spu_show_all_walls();
 void spu_set_sprite(int x, int y, int index);
 void spu_set_map(int *map);
+void spu_animate(int *map);
 
 #endif /* SPU_H_ */

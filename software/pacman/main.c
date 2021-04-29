@@ -21,13 +21,20 @@ void spu_control(int instruction)
 int main()
 {
 	printf("PacPac\n");
+	spu_show_all_sprites();
+	for (int i = 0; i < 65536; ++i) {}
 	int map[1200] = {0};
 	int count = 0;
 	for (int y = 0; y < SPU_MAP_HEIGHT; ++y) {
 		for (int x = 0; x < SPU_MAP_WIDTH; ++x) {
-			map[y * SPU_MAP_WIDTH + x] = (count++) % 49;
+			map[y * SPU_MAP_WIDTH + x] = (count++) % PAC_MAN_GAME_SPRITE_COUNT;
 		}
 	}
-	spu_set_map(map);
+	for (int i = 0; ; ++i) {
+		if (i % 1024 == 0) {
+			spu_set_map(map);
+			spu_animate(map);
+		}
+	}
 	return 0;
 }
