@@ -234,6 +234,8 @@ void test_map(int *map)
 		map[y * PACMAN_MAP_WIDTH + 26] = get_sprite(WALL);
 		map[y * PACMAN_MAP_WIDTH + 28] = get_sprite(WALL);
 	}
+	map[14 * PACMAN_MAP_WIDTH + 12] = get_sprite(BACKGROUND);
+	map[14 * PACMAN_MAP_WIDTH + 27] = get_sprite(BACKGROUND);
 	for (int x = 10; x <= 11; ++x) 
 		map[11 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
 	for (int x = 28; x <= 29; ++x) 
