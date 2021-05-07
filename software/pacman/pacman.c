@@ -256,7 +256,7 @@ void test_map(int *map)
 	}
 	map[PACMAN_MAP_WIDTH + 14] = get_sprite(WALL);
 	map[PACMAN_MAP_WIDTH + 25] = get_sprite(WALL);
-	for (int x = 14; x <= 25; ++x) {
+	for (int x = 14; x <= 25; ++x)
 		map[2 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
 	for (int x = 5; x <= 7; ++x)
 		map[3 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
