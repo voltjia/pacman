@@ -127,11 +127,8 @@ int next_sprite(int sprite)
 		return next_pacman(sprite);
 	case GHOST:
 		return next_ghost(sprite);
-	case FOOD:
-	case WALL:
-		return sprite;
 	default:
-		return -1;
+		return sprite;
 	}
 }
 
@@ -528,4 +525,15 @@ int can_walk(int *map, int x, int y)
 	int dest_sprite = map_get_sprite(map, x, y);
 	int dest_type = sprite_type(dest_sprite);
 	return dest_type != GHOST && dest_type != WALL;
+}
+
+void show_score(int *map, int score)
+{
+	for (int i = 0; i < 6; ++i) {
+		map[PACMAN_MAP_WIDTH + 15 + i] = 62 + i;
+	}
+	map[PACMAN_MAP_WIDTH + 15 + 6] = NUMBER_BASE + score / 1000;
+	map[PACMAN_MAP_WIDTH + 15 + 7] = NUMBER_BASE + (score / 100) % 10;
+	map[PACMAN_MAP_WIDTH + 15 + 8] = NUMBER_BASE + (score / 10) % 10;
+	map[PACMAN_MAP_WIDTH + 15 + 9] = NUMBER_BASE + score % 10;
 }
