@@ -16,7 +16,7 @@ module color_mapper (input  logic        clk,
    initial
    begin
       $readmemh("pallete.txt", pallete);
-      $readmemh("pacman.txt", pixels);
+      $readmemh("sprite_sheet.txt", pixels);
    end
 
    always_ff @ (posedge clk)

@@ -2,8 +2,8 @@
 <sch:Settings xmlns:sch="http://www.altera.com/embeddedsw/bsp/schema">
         <BspType>hal</BspType>
         <BspVersion>default</BspVersion>
-        <BspGeneratedTimeStamp>2021-4-27 16:46:14</BspGeneratedTimeStamp>
-        <BspGeneratedUnixTimeStamp>1619513174453</BspGeneratedUnixTimeStamp>
+        <BspGeneratedTimeStamp>2021-5-7 11:21:27</BspGeneratedTimeStamp>
+        <BspGeneratedUnixTimeStamp>1620357687194</BspGeneratedUnixTimeStamp>
         <BspGeneratedLocation>D:\ECE385\pacman\software\pacman_bsp</BspGeneratedLocation>
         <BspSettingsFile>settings.bsp</BspSettingsFile>
         <SopcDesignFile>..\..\pacman_soc.sopcinfo</SopcDesignFile>
