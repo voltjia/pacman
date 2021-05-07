@@ -10,10 +10,10 @@ def rgb_to_hex(num):
     return int(h[0:4], 16), int(('0x' + h[4:6]), 16), int(('0x' + h[6:8]), 16)
 filename = input("What's the file name? ")
 outFile = open("./sprite_bytes/" + filename + '.txt', 'w')
-imagename = input("What's the image name? Enter N/A when done. ")
-while imagename != "N/A":
-    new_w, new_h = map(int, input("What's the new height x width? Like 28 28. ").split(' '))
-    palette_hex = ['0xFFFF00', '0x000000', '0xDEDEFF', '0xFF0000', '0xFFB7AE', '0xFFB751', '0x00FFFF', '0x2121FF', '0xFFB7FF']
+imagename = input("What's the image name? Press Enter when done. ")
+while imagename != "":
+    new_w, new_h = 16, 16 #map(int, input("What's the new height x width? Like 28 28. ").split(' '))
+    palette_hex = ['0x000000', '0xDEDEFF', '0xFF0000', '0xFFB7AE', '0xDE9751', '0xFFB751', '0xFFFF00', '0x00FF00', '0x47B7AE', '0x00FFFF', '0x47B7FF', '0x2121FF', '0xFFB7FF']
     palette_rgb = [hex_to_rgb(color) for color in palette_hex]
 
     pixel_tree = KDTree(palette_rgb)
@@ -40,6 +40,6 @@ while imagename != "N/A":
                 outImg.putpixel((x,y), palette_rgb[index])
                 outFile.write("%x\n" % (index))
             i += 1
-    imagename = input("What's the image name? Enter N/A when done. ")
+    outImg.save("./sprite_converted/" + imagename + ".png")
+    imagename = input("What's the image name? Press Enter when done. ")
 outFile.close()
-#outImg.save("./sprite_converted/" + filename + ".png")
