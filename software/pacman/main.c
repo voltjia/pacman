@@ -173,13 +173,39 @@ void randomly_change_direction(int *map, int x, int y) {
 
 void ghost_go(int *map, int index)
 {
-	int ghost = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
+	int ghost = map_get_sprite(map, ghost_xs[index], ghost_ys[index]);
 	int direction = sprite_direction(ghost);
-	int dice = rand() % 3;
-	if (dice == 0) {
-		randomly_change_direction(map, *(ghost_xs + index), *(ghost_ys + index));
-		ghost = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
+	int dice = rand() % 10;
+	if (dice == 0)
+		randomly_change_direction(map, ghost_xs[index], ghost_ys[index]);
+	else if (dice == 1) {
+		if (index % 2 == 0) {
+			if (ghost_ys[index] > pacman_y)
+				map_set_sprite(map, ghost_xs[index], ghost_ys[index], get_sprite((ghost & ~SPRITE_DIRECTION_MASK) | (1 << SPRITE_DIRECTION_SHIFT)));
+			else
+				map_set_sprite(map, ghost_xs[index], ghost_ys[index], get_sprite((ghost & ~SPRITE_DIRECTION_MASK) | (2 << SPRITE_DIRECTION_SHIFT)));
+		} else {
+			if (ghost_xs[index] > pacman_x)
+				map_set_sprite(map, ghost_xs[index], ghost_ys[index], get_sprite((ghost & ~SPRITE_DIRECTION_MASK) | (3 << SPRITE_DIRECTION_SHIFT)));
+			else
+				map_set_sprite(map, ghost_xs[index], ghost_ys[index], get_sprite((ghost & ~SPRITE_DIRECTION_MASK) | (4 << SPRITE_DIRECTION_SHIFT)));
+		}
+	} else if (dice == 2){
+		if (index % 2 == 1) {
+			if (ghost_ys[index] > pacman_y)
+				map_set_sprite(map, ghost_xs[index], ghost_ys[index], get_sprite((ghost & ~SPRITE_DIRECTION_MASK) | (1 << SPRITE_DIRECTION_SHIFT)));
+			else
+				map_set_sprite(map, ghost_xs[index], ghost_ys[index], get_sprite((ghost & ~SPRITE_DIRECTION_MASK) | (2 << SPRITE_DIRECTION_SHIFT)));
+		} else {
+			if (ghost_xs[index] > pacman_x)
+				map_set_sprite(map, ghost_xs[index], ghost_ys[index], get_sprite((ghost & ~SPRITE_DIRECTION_MASK) | (3 << SPRITE_DIRECTION_SHIFT)));
+			else
+				map_set_sprite(map, ghost_xs[index], ghost_ys[index], get_sprite((ghost & ~SPRITE_DIRECTION_MASK) | (4 << SPRITE_DIRECTION_SHIFT)));
+		}
 	}
+
+	ghost = map_get_sprite(map, ghost_xs[index], ghost_ys[index]);
+	direction = sprite_direction(ghost);
 
 	switch (direction) {
 	case UP:
