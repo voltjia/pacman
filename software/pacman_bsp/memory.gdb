@@ -3,7 +3,7 @@
 # Machine generated for CPU 'nios2_processor' in SOPC Builder design 'pacman_soc'
 # SOPC Builder design path: ../../pacman_soc.sopcinfo
 #
-# Generated: Fri May 07 21:43:43 CST 2021
+# Generated: Fri May 07 12:10:15 CDT 2021
 
 # DO NOT MODIFY THIS FILE
 #

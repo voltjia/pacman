@@ -36,18 +36,21 @@ static BYTE addr = 1; 				//hard-wired USB address
 const char* const devclasses[] = { " Uninitialized", " HID Keyboard", " HID Mouse", " Mass storage" };
 
 BOOT_KBD_REPORT kbdbuf;
-BYTE key = 0;
+BYTE key0 = 0;
+BYTE key1 = 0;
 
 int map[1200];
 
 int pacman_x = 19;
 int pacman_y = 28;
+int ghost_x = 19;
+int ghost_y = 10;
 int under_ghost[4] = {-1, -1, -1, -1};
 int ghost_xs[4] = {19, 20, 18, 21};
 int ghost_ys[4] = {10, 10, 11, 11};
 
 int score = 0;
-
+int two_player = 0;
 int is_game_over = 0;
 
 BYTE GetDriverandReport()
@@ -280,16 +283,16 @@ void pacman_task()
 	int pacman = map_get_sprite(map, pacman_x, pacman_y);
 	int direction = sprite_direction(pacman);
 
-	printf("key: %x\n", key);
+	printf("key0: %x\n", key0);
 	printf("direction: %x\n", direction >> SPRITE_DIRECTION_SHIFT);
 
-	if (key == ARROW_UP && direction != UP) {
+	if (key0 == ARROW_UP && direction != UP) {
 		map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN | UP));
-	} else if (key == ARROW_DOWN && direction != DOWN) {
+	} else if (key0 == ARROW_DOWN && direction != DOWN) {
 		map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN | DOWN));
-	} else if (key == ARROW_LEFT && direction != LEFT) {
+	} else if (key0 == ARROW_LEFT && direction != LEFT) {
 		map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN | LEFT));
-	} else if (key == ARROW_RIGHT && direction != RIGHT) {
+	} else if (key0 == ARROW_RIGHT && direction != RIGHT) {
 		map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN | RIGHT));
 	}
 
@@ -369,6 +372,11 @@ void init_game()
 	ghost_ys[2] = 11;
 	ghost_ys[3] = 11;
 
+	for (int y = 0; y < PACMAN_MAP_HEIGHT; ++y) {
+		for (int x = 0; x < PACMAN_MAP_WIDTH; ++x) {
+			map[y * PACMAN_MAP_WIDTH + x] = get_sprite(SMALL | FOOD);
+		}
+	}
 	main_map(map);
 	map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN));
 	map_set_sprite(map, ghost_xs[0], ghost_ys[0], get_sprite(RED | GHOST | UP));
@@ -378,8 +386,167 @@ void init_game()
 	spu_set_map(map);
 
 	score = 0;
-
+	two_player = 0;
 	is_game_over = 0;
+}
+
+void init_2game()
+{
+	pacman_x = 19;
+	pacman_y = 28;
+	ghost_x = 19;
+	ghost_y = 10;
+
+	for (int y = 0; y < PACMAN_MAP_HEIGHT; ++y) {
+		for (int x = 0; x < PACMAN_MAP_WIDTH; ++x) {
+			map[y * PACMAN_MAP_WIDTH + x] = get_sprite(BACKGROUND);
+		}
+	}
+	main_map(map);
+	map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN));
+	map_set_sprite(map, ghost_x, ghost_y, get_sprite(RED | GHOST | DOWN));
+	spu_set_map(map);
+
+	score = 0;
+	two_player = 1;
+	is_game_over = 0;
+}
+
+void two_player_task() {
+	int pacman = map_get_sprite(map, pacman_x, pacman_y);
+	int pacman_dir = sprite_direction(pacman);
+
+	if (key0 == ARROW_UP && pacman_dir != UP) {
+		map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN | UP));
+	} else if (key0 == ARROW_DOWN && pacman_dir != DOWN) {
+		map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN | DOWN));
+	} else if (key0 == ARROW_LEFT && pacman_dir != LEFT) {
+		map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN | LEFT));
+	} else if (key0 == ARROW_RIGHT && pacman_dir != RIGHT) {
+		map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN | RIGHT));
+	}
+
+	pacman = map_get_sprite(map, pacman_x, pacman_y);
+	pacman_dir = sprite_direction(pacman);
+
+	switch (pacman_dir) {
+	case UP:
+		if (can_walk(map, pacman_x, pacman_y - 1)) {
+			map_set_sprite(map, pacman_x, pacman_y, BACKGROUND);
+			--pacman_y;
+			map_set_sprite(map, pacman_x, pacman_y, pacman);
+		}
+		break;
+	case DOWN:
+		if (can_walk(map, pacman_x, pacman_y + 1)) {
+			map_set_sprite(map, pacman_x, pacman_y, BACKGROUND);
+			++pacman_y;
+			map_set_sprite(map, pacman_x, pacman_y, pacman);
+		}
+		break;
+	case LEFT:
+		if (can_walk(map, pacman_x - 1, pacman_y)) {
+			map_set_sprite(map, pacman_x, pacman_y, BACKGROUND);
+			--pacman_x;
+			map_set_sprite(map, pacman_x, pacman_y, pacman);
+		}
+		break;
+	case RIGHT:
+		if (can_walk(map, pacman_x + 1, pacman_y)) {
+			map_set_sprite(map, pacman_x, pacman_y, BACKGROUND);
+			++pacman_x;
+			map_set_sprite(map, pacman_x, pacman_y, pacman);
+		}
+		break;
+	}
+
+	int ghost = map_get_sprite(map, ghost_x, ghost_y);
+	int ghost_dir = sprite_direction(ghost);
+
+	if (key1 == KEY_W && ghost_dir != UP) {
+		map_set_sprite(map, ghost_x, ghost_y, get_sprite(RED | GHOST | UP));
+	} else if (key1 == KEY_S && ghost_dir != DOWN) {
+		map_set_sprite(map, ghost_x, ghost_y, get_sprite(RED | GHOST | DOWN));
+	} else if (key1 == KEY_A && ghost_dir != LEFT) {
+		map_set_sprite(map, ghost_x, ghost_y, get_sprite(RED | GHOST | LEFT));
+	} else if (key1 == KEY_D && ghost_dir != RIGHT) {
+		map_set_sprite(map, ghost_x, ghost_y, get_sprite(RED | GHOST | RIGHT));
+	}
+
+	ghost = map_get_sprite(map, ghost_x, ghost_y);
+	ghost_dir = sprite_direction(ghost);
+
+	switch (ghost_dir) {
+	case UP:
+		if (can_walk(map, ghost_x, ghost_y - 1)) {
+			if (sprite_type(map[(ghost_y - 1) * PACMAN_MAP_WIDTH + ghost_x]) == PACMAN) {
+				game_over(map);
+				is_game_over = 1;
+				show_score(map, score);
+				spu_set_map(map);
+				return;
+			} else {
+				map_set_sprite(map, ghost_x, ghost_y, BACKGROUND);
+				--ghost_y;
+				map_set_sprite(map, ghost_x, ghost_y, ghost);
+			}
+		}
+		break;
+	case DOWN:
+		if (can_walk(map, ghost_x, ghost_y + 1)) {
+			if (sprite_type(map[(ghost_y + 1) * PACMAN_MAP_WIDTH + ghost_x]) == PACMAN) {
+				game_over(map);
+				is_game_over = 1;
+				show_score(map, score);
+				spu_set_map(map);
+				return;
+			} else {
+				map_set_sprite(map, ghost_x, ghost_y, BACKGROUND);
+				++ghost_y;
+				map_set_sprite(map, ghost_x, ghost_y, ghost);
+			}
+		}
+		break;
+	case LEFT:
+		if (can_walk(map, ghost_x - 1, ghost_y)) {
+			if (sprite_type(map[ghost_y * PACMAN_MAP_WIDTH + ghost_x - 1]) == PACMAN) {
+				game_over(map);
+				is_game_over = 1;
+				show_score(map, score);
+				spu_set_map(map);
+				return;
+			} else {
+				map_set_sprite(map, ghost_x, ghost_y, BACKGROUND);
+				--ghost_x;
+				map_set_sprite(map, ghost_x, ghost_y, ghost);
+			}
+		}
+		break;
+	case RIGHT:
+		if (can_walk(map, ghost_x + 1, ghost_y)) {
+			if (sprite_type(map[ghost_y * PACMAN_MAP_WIDTH + ghost_x + 1]) == PACMAN) {
+				game_over(map);
+				is_game_over = 1;
+				show_score(map, score);
+				spu_set_map(map);
+				return;
+			} else {
+				map_set_sprite(map, ghost_x, ghost_y, BACKGROUND);
+				++ghost_x;
+				map_set_sprite(map, ghost_x, ghost_y, ghost);
+			}
+		}
+		break;
+	}
+
+	score++;
+	animate_map(map);
+	if (score > 500) {
+		you_win(map);
+		is_game_over = 1;
+	}
+	show_score(map, score);
+	spu_set_map(map);
 }
 
 int main()
@@ -397,25 +564,24 @@ int main()
 
 	MAX3421E_init();
 	USB_init();
+	init_game();
 
 	printf("PacPac\n");
-
-	main_map(map);
-	map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN));
-	map_set_sprite(map, ghost_xs[0], ghost_ys[0], get_sprite(RED | GHOST | UP));
-	map_set_sprite(map, ghost_xs[1], ghost_ys[1], get_sprite(PINK | GHOST | UP));
-	map_set_sprite(map, ghost_xs[2], ghost_ys[2], get_sprite(CYAN | GHOST | UP));
-	map_set_sprite(map, ghost_xs[3], ghost_ys[3], get_sprite(TEAL | GHOST | UP));
-	spu_set_map(map);
 
 	for (int i = 0; ; ++i) {
 		MAX3421E_Task();
 		USB_Task();
-		if (key == 0x28) {
+		if (key0 == 0x28) {
 			init_game();
 		}
+		if (key0 == 0x2c) {
+			init_2game();
+		}
 		if (!is_game_over) {
-			pacman_task();
+			if (two_player)
+				two_player_task();
+			else
+				pacman_task();
 		}
 		//usleep (500000);
 		if (GetUsbTaskState() == USB_STATE_RUNNING) {
@@ -438,8 +604,13 @@ int main()
 					printf("%x ", kbdbuf.keycode[n]);
 				}
 				BYTE temp = kbdbuf.keycode[0];
-				//if (temp == 0x52 || temp == 0x51 || temp == 0x50 || temp == 0x4f)
-				key = temp;
+				if (temp == 0x52 || temp == 0x51 || temp == 0x50 || temp == 0x4f || temp == 0x28 || temp == 0x2c) {
+					key0 = temp;
+					key1 = kbdbuf.keycode[1];
+				} else {
+					key0 = kbdbuf.keycode[1];
+					key1 = temp;
+				}
 //				setKeycode(kbdbuf.keycode[0]);
 //				printSignedHex0(kbdbuf.keycode[0]);
 //				printSignedHex1(kbdbuf.keycode[1]);
