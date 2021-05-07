@@ -31,10 +31,32 @@ module pacman (input         MAX10_CLK1_50,
    logic [3:0]   pixel_red, pixel_green, pixel_blue;
    logic [9:0]   pixel_x, pixel_y;
    logic [31:0]  control;
-   logic [31:0]  gpio_0_in, gpio_0_out;
-   logic [31:0]  gpio_1_in, gpio_1_out;
-   logic [31:0]  gpio_2_in, gpio_2_out;
-   logic [31:0]  gpio_3_in, gpio_3_out;
+	logic SPI_CS_N, SPI_SCLK, SPI_MISO, SPI_MOSI, USB_GPX, USB_IRQ, USB_RST;
+//   logic [31:0]  gpio_0_in, gpio_0_out;
+//   logic [31:0]  gpio_1_in, gpio_1_out;
+//   logic [31:0]  gpio_2_in, gpio_2_out;
+//   logic [31:0]  gpio_3_in, gpio_3_out;
+
+//=======================================================
+//  Structural coding
+//=======================================================
+	assign ARDUINO_IO[10] = SPI_CS_N;
+	assign ARDUINO_IO[13] = SPI_SCLK;
+	assign ARDUINO_IO[11] = SPI_MOSI;
+	assign ARDUINO_IO[12] = 1'bZ;
+	assign SPI_MISO = ARDUINO_IO[12];
+	
+	assign ARDUINO_IO[9] = 1'bZ; 
+	assign USB_IRQ = ARDUINO_IO[9];
+		
+	//Assignments specific to Circuits At Home UHS_20
+	assign ARDUINO_RESET_N = USB_RST;
+	assign ARDUINO_IO[7] = USB_RST;//USB reset 
+	assign ARDUINO_IO[8] = 1'bZ; //this is GPX (set to input)
+	assign USB_GPX = 1'b0;//GPX is not needed for standard USB host - set to 0 to prevent interrupt
+	
+	//Assign uSD CS to '1' to prevent uSD card from interfering with USB Host (if uSD card is plugged in)
+	assign ARDUINO_IO[6] = 1'b1;
 
    // Reset - active low
    assign reset = ~KEY[0];
@@ -80,12 +102,12 @@ module pacman (input         MAX10_CLK1_50,
       .blue(pixel_blue));
 
    pacman_soc pacman_soc (
-      .clk_clk(MAX10_CLK1_50),                                // clk.clk
-      .reset_reset_n(1'b1),                                   // reset.reset_n
-      // .altpll_0_locked_conduit_export    (),               // altpll_0_locked_conduit.export
-      // .altpll_0_phasedone_conduit_export (),               // altpll_0_phasedone_conduit.export
-      // .altpll_0_areset_conduit_export    (),               // altpll_0_areset_conduit.export
-      // .key_external_connection_export    (KEY),            // key_external_connection.export
+      .clk_clk									  (MAX10_CLK1_50),  // clk.clk
+      .reset_reset_n							  (1'b1),           // reset.reset_n
+      .altpll_0_locked_conduit_export    (),               // altpll_0_locked_conduit.export
+      .altpll_0_phasedone_conduit_export (),               // altpll_0_phasedone_conduit.export
+      .altpll_0_areset_conduit_export    (),               // altpll_0_areset_conduit.export
+      .key_external_connection_export    (KEY),            // key_external_connection.export
 
       // SDRAM
       .sdram_clk_clk(DRAM_CLK),                            // clk_sdram.clk
@@ -100,10 +122,10 @@ module pacman (input         MAX10_CLK1_50,
       .sdram_wire_we_n(DRAM_WE_N),                         // .we_n
 
       // USB SPI   
-      .spi_SS_n(SPI0_CS_N),
-      .spi_MOSI(SPI0_MOSI),
-      .spi_MISO(SPI0_MISO),
-      .spi_SCLK(SPI0_SCLK),
+      .spi_SS_n(SPI_CS_N),
+      .spi_MOSI(SPI_MOSI),
+      .spi_MISO(SPI_MISO),
+      .spi_SCLK(SPI_SCLK),
 
       // USB GPIO
       .usb_rst_export(USB_RST),
@@ -112,15 +134,21 @@ module pacman (input         MAX10_CLK1_50,
 
       // Control
       .control_export(control),
+		
+		//LEDs and HEX
+		.hex_digits_export({hex_num_4, hex_num_3, hex_num_1, hex_num_0}),
+		.leds_export({hundreds, signs, LEDR}),
+		.keycode_export(keycode)
 
       // GPIOs
-      .gpio_0_in_port(gpio_0_in),
-      .gpio_0_out_port(gpio_0_out),
-      .gpio_1_in_port(gpio_1_in),
-      .gpio_1_out_port(gpio_1_out),
-      .gpio_2_in_port(gpio_2_in),
-      .gpio_2_out_port(gpio_2_out),
-      .gpio_3_in_port(gpio_3_in),
-      .gpio_3_out_port(gpio_3_out));
+//      .gpio_0_in_port(gpio_0_in),
+//      .gpio_0_out_port(gpio_0_out),
+//      .gpio_1_in_port(gpio_1_in),
+//      .gpio_1_out_port(gpio_1_out),
+//      .gpio_2_in_port(gpio_2_in),
+//      .gpio_2_out_port(gpio_2_out),
+//      .gpio_3_in_port(gpio_3_in),
+//      .gpio_3_out_port(gpio_3_out)
+	);
 
 endmodule

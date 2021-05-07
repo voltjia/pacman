@@ -49,7 +49,7 @@ module pacman_soc_sysid_qsys (
 
   wire    [ 31: 0] readdata;
   //control_slave, which is an e_avalon_slave
-  assign readdata = address ? 1619513039 : 0;
+  assign readdata = address ? 1620374301 : 0;
 
 endmodule
 
