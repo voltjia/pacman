@@ -65,9 +65,9 @@ int get_food(int food)
 {
 	switch (sprite_property(food)) {
 	case SMALL:
-		return FOOD_BASE;
-	case BIG:
 		return FOOD_BASE + 1;
+	case BIG:
+		return FOOD_BASE;
 	default:
 		return -1;
 	}
@@ -87,6 +87,16 @@ int get_sprite(int sprite)
 	default:
 		return -1;
 	}
+}
+
+int map_get_sprite(int *map, int x, int y)
+{
+	return map[y * PACMAN_MAP_WIDTH + x];
+}
+
+int map_set_sprite(int *map, int x, int y, int sprite)
+{
+	map[y * PACMAN_MAP_WIDTH + x] = sprite;
 }
 
 int next_pacman(int pacman)
@@ -148,5 +158,22 @@ void random_map(int *map)
 		for (int x = 0; x < PACMAN_MAP_WIDTH; ++x) {
 			map[y * PACMAN_MAP_WIDTH + x] = get_sprite(random_sprite());
 		}
+	}
+}
+
+void test_map(int *map)
+{
+	for (int y = 0; y < PACMAN_MAP_HEIGHT; ++y) {
+		for (int x = 0; x < PACMAN_MAP_WIDTH; ++x) {
+			map[y * PACMAN_MAP_WIDTH + x] = get_sprite(SMALL | FOOD);
+		}
+	}
+	for (int x = 0; x < PACMAN_MAP_WIDTH; ++x) {
+		map[x] = get_sprite(WALL);
+		map[(PACMAN_MAP_HEIGHT - 1) * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	}
+	for (int y = 0; y < PACMAN_MAP_HEIGHT; ++y) {
+		map[y * PACMAN_MAP_WIDTH] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + PACMAN_MAP_WIDTH - 1] = get_sprite(WALL);
 	}
 }

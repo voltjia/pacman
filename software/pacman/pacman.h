@@ -29,6 +29,7 @@
 #define WALL (3 << SPRITE_TYPE_SHIFT)
 #define SPRITE_TYPE_SIZE 4
 
+#define BACKGROUND_COLOR -1
 #define BLACK (0 << SPRITE_PROPERTY_SHIFT)
 #define WHITE (1 << SPRITE_PROPERTY_SHIFT)
 #define YELLOW (2 << SPRITE_PROPERTY_SHIFT)
@@ -67,6 +68,8 @@ int sprite_property(int sprite);
 int get_pacman(int pacman);
 int get_ghost(int ghost);
 int get_sprite(int sprite);
+int map_get_sprite(int *map, int x, int y);
+int map_set_sprite(int *map, int x, int y, int sprite);
 int next_sprite(int sprite);
 int animate_map(int *map);
 int random_sprite();

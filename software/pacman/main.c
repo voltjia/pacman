@@ -14,6 +14,17 @@
 #include "usb_kb/usb_ch9.h"
 #include "usb_kb/USB.h"
 
+#define ARROW_UP 0x52
+#define ARROW_DOWN 0x51
+#define ARROW_LEFT 0x50
+#define ARROW_RIGHT 0x4f
+#define KEY_W 0x1a
+#define KEY_A 0x04
+#define KEY_S 0x16
+#define KEY_D 0x07
+
+#define NUM_THREADS 5
+
 void spu_control(int instruction)
 {
 	IOWR_ALTERA_AVALON_PIO_DATA(CONTROL_BASE, instruction);
@@ -24,7 +35,16 @@ extern HID_DEVICE hid_device;
 static BYTE addr = 1; 				//hard-wired USB address
 const char* const devclasses[] = { " Uninitialized", " HID Keyboard", " HID Mouse", " Mass storage" };
 
-BYTE GetDriverandReport() {
+BOOT_KBD_REPORT kbdbuf;
+BYTE key = 0;
+
+int map[1200];
+
+int pacman_x = 19;
+int pacman_y = 28;
+
+BYTE GetDriverandReport()
+{
 	BYTE i;
 	BYTE rcode;
 	BYTE device = 0xFF;
@@ -60,18 +80,21 @@ BYTE GetDriverandReport() {
 	return device;
 }
 
-void setLED(int LED) {
+void setLED(int LED)
+{
 	IOWR_ALTERA_AVALON_PIO_DATA(LEDS_PIO_BASE,
 			(IORD_ALTERA_AVALON_PIO_DATA(LEDS_PIO_BASE) | (0x001 << LED)));
 }
 
-void clearLED(int LED) {
+void clearLED(int LED)
+{
 	IOWR_ALTERA_AVALON_PIO_DATA(LEDS_PIO_BASE,
 			(IORD_ALTERA_AVALON_PIO_DATA(LEDS_PIO_BASE) & ~(0x001 << LED)));
 
 }
 
-void printSignedHex0(signed char value) {
+void printSignedHex0(signed char value)
+{
 	BYTE tens = 0;
 	BYTE ones = 0;
 	WORD pio_val = IORD_ALTERA_AVALON_PIO_DATA(HEX_DIGITS_PIO_BASE);
@@ -98,7 +121,8 @@ void printSignedHex0(signed char value) {
 	IOWR_ALTERA_AVALON_PIO_DATA(HEX_DIGITS_PIO_BASE, pio_val);
 }
 
-void printSignedHex1(signed char value) {
+void printSignedHex1(signed char value)
+{
 	BYTE tens = 0;
 	BYTE ones = 0;
 	DWORD pio_val = IORD_ALTERA_AVALON_PIO_DATA(HEX_DIGITS_PIO_BASE);
@@ -131,7 +155,55 @@ void setKeycode(WORD keycode)
 {
 	IOWR_ALTERA_AVALON_PIO_DATA(KEYCODE_BASE, keycode);
 }
-int main() {
+
+void pacman_task()
+{
+	int pacman = map_get_sprite(map, pacman_x, pacman_y);
+	int pacman_direction = sprite_direction(pacman);
+
+	if (key == ARROW_UP && pacman_direction != UP) {
+		map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN | UP));
+	} else if (key == ARROW_DOWN && pacman_direction != DOWN) {
+		map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN | DOWN));
+	} else if (key == ARROW_LEFT && pacman_direction != LEFT) {
+		map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN | LEFT));
+	} else if (key == ARROW_RIGHT && pacman_direction != RIGHT) {
+		map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN | RIGHT));
+	}
+
+	switch (pacman_direction) {
+	case UP:
+		if (pacman_y > 0) {
+			map_set_sprite(map, pacman_x, pacman_y, BACKGROUND_COLOR);
+			map_set_sprite(map, pacman_x, --pacman_y, pacman);
+		}
+		break;
+	case DOWN:
+		if (pacman_y < PACMAN_MAP_HEIGHT - 1) {
+			map_set_sprite(map, pacman_x, pacman_y, BACKGROUND_COLOR);
+			map_set_sprite(map, pacman_x, ++pacman_y, pacman);
+		}
+		break;
+	case LEFT:
+		if (pacman_x > 0) {
+			map_set_sprite(map, pacman_x, pacman_y, BACKGROUND_COLOR);
+			map_set_sprite(map, --pacman_x, pacman_y, pacman);
+		}
+		break;
+	case RIGHT:
+		if (pacman_x < PACMAN_MAP_WIDTH - 1) {
+			map_set_sprite(map, pacman_x, pacman_y, BACKGROUND_COLOR);
+			map_set_sprite(map, ++pacman_x, pacman_y, pacman);
+		}
+		break;
+	}
+
+	animate_map(map);
+	spu_set_map(map);
+}
+
+int main()
+{
 	BYTE rcode;
 	BOOT_MOUSE_REPORT buf;		//USB mouse report
 	BOOT_KBD_REPORT kbdbuf;
@@ -145,39 +217,11 @@ int main() {
 	USB_init();
 
 	printf("PacPac\n");
-	int map[1200] = {0};
-	random_map(map);
+	test_map(map);
+	map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN));
 	spu_set_map(map);
 
-	int x = 15;
-	int y = 20;
-	BYTE key = 0;
 	for (int i = 0; ; ++i) {
-		printf("i = %d, x = %d, y = %d, key = %x\n", i, x, y, key);
-		if (key == 0x52 && y > 0) {
-			printf("up\n");
-			map[y-1 * SPU_MAP_WIDTH + x] = map[y * SPU_MAP_WIDTH + x];
-			map[y * SPU_MAP_WIDTH + x] = -1;
-			y--;
-		} else if (key == 0x51 && y < SPU_MAP_HEIGHT-1) {
-			printf("down\n");
-			map[y+1 * SPU_MAP_WIDTH + x] = map[y * SPU_MAP_WIDTH + x];
-			map[y * SPU_MAP_WIDTH + x] = -1;
-			y++;
-		} else if (key == 0x50 && x > 0) {
-			printf("left\n");
-			map[y * SPU_MAP_WIDTH + x-1] = map[y * SPU_MAP_WIDTH + x];
-			map[y * SPU_MAP_WIDTH + x] = -1;
-			x--;
-		} else if (key == 0x4f && x < SPU_MAP_WIDTH-1) {
-			printf("right\n");
-			map[y * SPU_MAP_WIDTH + x+1] = map[y * SPU_MAP_WIDTH + x];
-			map[y * SPU_MAP_WIDTH + x] = -1;
-			x++;
-		}
-		spu_set_map(map);
-		animate_map(map);
-
 		MAX3421E_Task();
 		USB_Task();
 		//usleep (500000);
@@ -258,6 +302,8 @@ int main() {
 			errorflag = 0;
 			clearLED(9);
 		}
+
+		pacman_task();
 	}
 
 	return 0;
