@@ -42,6 +42,14 @@ int map[1200];
 
 int pacman_x = 19;
 int pacman_y = 28;
+int red_ghost_x = 19;
+int red_ghost_y = 9;
+int pink_ghost_x = 19;
+int pink_ghost_y = 12;
+int cyan_ghost_x = 18;
+int cyan_ghost_y = 12;
+int teal_ghost_x = 20;
+int teal_ghost_y = 12;
 
 BYTE GetDriverandReport()
 {
@@ -235,11 +243,16 @@ int main()
 	printf("PacPac\n");
 	test_map(map);
 	map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN));
+	map_set_sprite(map, red_ghost_x, red_ghost_y, get_sprite(RED | GHOST | LEFT));
+	map_set_sprite(map, pink_ghost_x, pink_ghost_y, get_sprite(PINK | GHOST | UP));
+	map_set_sprite(map, cyan_ghost_x, cyan_ghost_y, get_sprite(CYAN | GHOST | UP));
+	map_set_sprite(map, teal_ghost_x, teal_ghost_y, get_sprite(TEAL | GHOST | UP));
 	spu_set_map(map);
 
 	for (int i = 0; ; ++i) {
 		MAX3421E_Task();
 		USB_Task();
+		pacman_task();
 		//usleep (500000);
 		if (GetUsbTaskState() == USB_STATE_RUNNING) {
 			if (!runningdebugflag) {
@@ -318,8 +331,6 @@ int main()
 			errorflag = 0;
 			clearLED(9);
 		}
-
-		pacman_task();
 	}
 
 	return 0;

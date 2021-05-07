@@ -1,7 +1,7 @@
 /*
  * pacman.c
  *
- *  Created on: 2021Äê4ÔÂ30ÈÕ
+ *  Created on: 2021ï¿½ï¿½4ï¿½ï¿½30ï¿½ï¿½
  *      Author: user
  */
 
@@ -176,4 +176,14 @@ void test_map(int *map)
 		map[y * PACMAN_MAP_WIDTH] = get_sprite(WALL);
 		map[y * PACMAN_MAP_WIDTH + PACMAN_MAP_WIDTH - 1] = get_sprite(WALL);
 	}
+	for (int x = 17; x <= 21; ++x)
+		map[13 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	for (int x = 17; x <= 21; ++x)
+		map[10 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	for (int y = 10; y <= 12; ++y)
+		map[y * PACMAN_MAP_WIDTH + 17] = get_sprite(WALL);
+	for (int y = 10; y <= 12; ++y)
+		map[y * PACMAN_MAP_WIDTH + 21] = get_sprite(WALL);
+	for (int x = 18; x <= 20; ++x)
+		map[11 * PACMAN_MAP_WIDTH + x] = get_sprite(BACKGROUND);
 }
