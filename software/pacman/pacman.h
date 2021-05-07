@@ -58,7 +58,14 @@
 #define GHOST_EYES_BASE 45
 #define FOOD_BASE 49
 #define WALL_BASE 51
-#define SPRITE_COUNT 52
+#define NUMBER_BASE 52
+#define ALPHABET_S 62
+#define ALPHABET_C 63
+#define ALPHABET_O 64
+#define ALPHABET_R 65
+#define ALPHABET_E 66
+#define ALPHABET_COLON 67
+#define SPRITE_COUNT 68
 
 void spawn_all_sprites(int *map);
 int sprite_index(int sprite);
@@ -77,5 +84,6 @@ void random_map(int *map);
 void test_map(int *map);
 void game_over(int *map);
 int can_walk(int *map, int x, int y);
+void show_score(int *map, int score);
 
 #endif /* PACMAN_H_ */

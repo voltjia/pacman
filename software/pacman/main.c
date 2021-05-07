@@ -46,6 +46,8 @@ int under_ghost[4] = {-1, -1, -1, -1};
 int ghost_xs[4] = {19, 20, 18, 21};
 int ghost_ys[4] = {10, 10, 11, 11};
 
+int score = 0;
+
 BYTE GetDriverandReport()
 {
 	BYTE i;
@@ -288,25 +290,41 @@ void pacman_task()
 	case UP:
 		if (can_walk(map, pacman_x, pacman_y - 1)) {
 			map_set_sprite(map, pacman_x, pacman_y, BACKGROUND);
-			map_set_sprite(map, pacman_x, --pacman_y, pacman);
+			--pacman_y;
+			if (sprite_type(map_get_sprite(map, pacman_x, pacman_y)) == FOOD) {
+				score += 5;
+			}
+			map_set_sprite(map, pacman_x, pacman_y, pacman);
 		}
 		break;
 	case DOWN:
 		if (can_walk(map, pacman_x, pacman_y + 1)) {
 			map_set_sprite(map, pacman_x, pacman_y, BACKGROUND);
-			map_set_sprite(map, pacman_x, ++pacman_y, pacman);
+			++pacman_y;
+			if (sprite_type(map_get_sprite(map, pacman_x, pacman_y)) == FOOD) {
+				score += 5;
+			}
+			map_set_sprite(map, pacman_x, pacman_y, pacman);
 		}
 		break;
 	case LEFT:
 		if (can_walk(map, pacman_x - 1, pacman_y)) {
 			map_set_sprite(map, pacman_x, pacman_y, BACKGROUND);
-			map_set_sprite(map, --pacman_x, pacman_y, pacman);
+			--pacman_x;
+			if (sprite_type(map_get_sprite(map, pacman_x, pacman_y)) == FOOD) {
+				score += 5;
+			}
+			map_set_sprite(map, pacman_x, pacman_y, pacman);
 		}
 		break;
 	case RIGHT:
 		if (can_walk(map, pacman_x + 1, pacman_y)) {
 			map_set_sprite(map, pacman_x, pacman_y, BACKGROUND);
-			map_set_sprite(map, ++pacman_x, pacman_y, pacman);
+			++pacman_x;
+			if (sprite_type(map_get_sprite(map, pacman_x, pacman_y)) == FOOD) {
+				score += 5;
+			}
+			map_set_sprite(map, pacman_x, pacman_y, pacman);
 		}
 		break;
 	}
@@ -316,11 +334,17 @@ void pacman_task()
 	}
 
 	animate_map(map);
+	show_score(map, score);
 	spu_set_map(map);
 }
 
 int main()
 {
+	/*
+	spawn_all_sprites(map);
+	spu_set_map(map);
+	for (;;) {}
+	*/
 	srand (time(NULL));
 
 	BYTE rcode;
