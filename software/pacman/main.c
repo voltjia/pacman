@@ -42,7 +42,7 @@ int map[1200];
 
 int pacman_x = 19;
 int pacman_y = 28;
-int under_ghost[4] = {0};
+int under_ghost[4] = {-1, -1, -1, -1};
 int ghost_xs[4] = {19, 20, 18, 21};
 int ghost_ys[4] = {10, 10, 11, 11};
 
@@ -180,6 +180,9 @@ void ghost_go(int *map, int index)
 			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), under_ghost[index]);
 			--(*(ghost_ys + index));
 			under_ghost[index] = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
+			if (sprite_type(under_ghost[index]) == PACMAN) {
+				game_over(map);
+			}
 			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
 			return;
 		}
@@ -189,6 +192,9 @@ void ghost_go(int *map, int index)
 			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), under_ghost[index]);
 			++(*(ghost_ys + index));
 			under_ghost[index] = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
+			if (sprite_type(under_ghost[index]) == PACMAN) {
+				game_over(map);
+			}
 			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
 			return;
 		}
@@ -198,6 +204,9 @@ void ghost_go(int *map, int index)
 			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), under_ghost[index]);
 			--(*(ghost_xs + index));
 			under_ghost[index] = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
+			if (sprite_type(under_ghost[index]) == PACMAN) {
+				game_over(map);
+			}
 			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
 			return;
 		}
@@ -207,6 +216,9 @@ void ghost_go(int *map, int index)
 			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), under_ghost[index]);
 			++(*(ghost_xs + index));
 			under_ghost[index] = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
+			if (sprite_type(under_ghost[index]) == PACMAN) {
+				game_over(map);
+			}
 			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
 			return;
 		}
@@ -219,21 +231,34 @@ void ghost_go(int *map, int index)
 	if (can_walk(map, *(ghost_xs + index), *(ghost_ys + index) - 1)) {
 		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), under_ghost[index]);
 		--(*(ghost_ys + index));
+		under_ghost[index] = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
+		if (sprite_type(under_ghost[index]) == PACMAN) {
+			game_over(map);
+		}
 		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
-	}
-	if (can_walk(map, *(ghost_xs + index), *(ghost_ys + index) + 1)) {
+	} else if (can_walk(map, *(ghost_xs + index), *(ghost_ys + index) + 1)) {
 		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), under_ghost[index]);
 		++(*(ghost_ys + index));
+		under_ghost[index] = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
+		if (sprite_type(under_ghost[index]) == PACMAN) {
+			game_over(map);
+		}
 		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
-	}
-	if (can_walk(map, *(ghost_xs + index) - 1, *(ghost_ys + index))) {
+	} else if (can_walk(map, *(ghost_xs + index) - 1, *(ghost_ys + index))) {
 		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), under_ghost[index]);
 		--(*(ghost_xs + index));
+		under_ghost[index] = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
+		if (sprite_type(under_ghost[index]) == PACMAN) {
+			game_over(map);
+		}
 		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
-	}
-	if (can_walk(map, *(ghost_xs + index) + 1, *(ghost_ys + index))) {
+	} else if (can_walk(map, *(ghost_xs + index) + 1, *(ghost_ys + index))) {
 		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), under_ghost[index]);
 		++(*(ghost_xs + index));
+		under_ghost[index] = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
+		if (sprite_type(under_ghost[index]) == PACMAN) {
+			game_over(map);
+		}
 		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
 	}
 }
@@ -289,8 +314,6 @@ void pacman_task()
 	for (int i = 0; i < 4; ++i) {
 		ghost_go(map, i);
 	}
-
-	printf("(%d, %d): %x\n", ghost_xs[0], ghost_ys[0], map_get_sprite(map, ghost_xs[0], ghost_ys[0]));
 
 	animate_map(map);
 	spu_set_map(map);
