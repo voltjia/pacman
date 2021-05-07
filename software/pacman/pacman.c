@@ -341,3 +341,13 @@ void test_map(int *map)
 	map[27 * PACMAN_MAP_WIDTH + 4] = get_sprite(WALL);
 	map[27 * PACMAN_MAP_WIDTH + 35] = get_sprite(WALL);
 }
+
+int can_walk(int *map, int x, int y)
+{
+	if (x == -1 || y == -1 || x == PACMAN_MAP_WIDTH || y == PACMAN_MAP_HEIGHT) {
+		return 0;
+	}
+	int dest_sprite = map_get_sprite(map, x, y);
+	int dest_type = sprite_type(dest_sprite);
+	return dest_type != GHOST && dest_type != WALL;
+}

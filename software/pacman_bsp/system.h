@@ -4,7 +4,7 @@
  * Machine generated for CPU 'nios2_processor' in SOPC Builder design 'pacman_soc'
  * SOPC Builder design path: ../../pacman_soc.sopcinfo
  *
- * Generated: Fri May 07 16:02:57 CST 2021
+ * Generated: Fri May 07 21:43:43 CST 2021
  */
 
 /*
@@ -367,8 +367,8 @@
 #define ONCHIP_MEMORY_READ_DURING_WRITE_MODE "DONT_CARE"
 #define ONCHIP_MEMORY_SINGLE_CLOCK_OP 0
 #define ONCHIP_MEMORY_SIZE_MULTIPLE 1
-#define ONCHIP_MEMORY_SIZE_VALUE 4096
-#define ONCHIP_MEMORY_SPAN 4096
+#define ONCHIP_MEMORY_SIZE_VALUE 131072
+#define ONCHIP_MEMORY_SPAN 131072
 #define ONCHIP_MEMORY_TYPE "altera_avalon_onchip_memory2"
 #define ONCHIP_MEMORY_WRITABLE 1
 
@@ -469,7 +469,7 @@
 #define SYSID_QSYS_IRQ_INTERRUPT_CONTROLLER_ID -1
 #define SYSID_QSYS_NAME "/dev/sysid_qsys"
 #define SYSID_QSYS_SPAN 8
-#define SYSID_QSYS_TIMESTAMP 1620374301
+#define SYSID_QSYS_TIMESTAMP 1620394867
 #define SYSID_QSYS_TYPE "altera_avalon_sysid_qsys"
 
 

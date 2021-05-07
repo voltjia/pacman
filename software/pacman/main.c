@@ -25,8 +25,6 @@
 #define KEY_S 0x16
 #define KEY_D 0x07
 
-#define NUM_THREADS 5
-
 void spu_control(int instruction)
 {
 	IOWR_ALTERA_AVALON_PIO_DATA(CONTROL_BASE, instruction);
@@ -44,14 +42,9 @@ int map[1200];
 
 int pacman_x = 19;
 int pacman_y = 28;
-int red_ghost_x = 19;
-int red_ghost_y = 10;
-int pink_ghost_x = 20;
-int pink_ghost_y = 10;
-int cyan_ghost_x = 18;
-int cyan_ghost_y = 11;
-int teal_ghost_x = 21;
-int teal_ghost_y = 11;
+int under_ghost[4] = {0};
+int ghost_xs[4] = {19, 20, 18, 21};
+int ghost_ys[4] = {10, 10, 11, 11};
 
 BYTE GetDriverandReport()
 {
@@ -166,38 +159,107 @@ void setKeycode(WORD keycode)
 	IOWR_ALTERA_AVALON_PIO_DATA(KEYCODE_BASE, keycode);
 }
 
-int can_walk(int *map, int x, int y)
+void randomly_change_direction(int *map, int x, int y) {
+	int sprite = map_get_sprite(map, x, y);
+	map_set_sprite(map, x, y, (sprite & ~SPRITE_DIRECTION_MASK) | ((rand() % 4 + 1) << SPRITE_DIRECTION_SHIFT));
+}
+
+void ghost_go(int *map, int index)
 {
-	if (x == -1 || y == -1 || x == PACMAN_MAP_WIDTH || y == PACMAN_MAP_HEIGHT) {
-		return 0;
+	int ghost = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
+	int direction = sprite_direction(ghost);
+	int dice = rand() % 3;
+	if (dice == 0) {
+		randomly_change_direction(map, *(ghost_xs + index), *(ghost_ys + index));
+		ghost = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
 	}
-	int dest_sprite = map_get_sprite(map, x, y);
-	int dest_type = sprite_type(dest_sprite);
-	return dest_type != GHOST && dest_type != WALL;
+
+	switch (direction) {
+	case UP:
+		if (can_walk(map, *(ghost_xs + index), *(ghost_ys + index) - 1)) {
+			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), under_ghost[index]);
+			--(*(ghost_ys + index));
+			under_ghost[index] = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
+			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
+			return;
+		}
+		break;
+	case DOWN:
+		if (can_walk(map, *(ghost_xs + index), *(ghost_ys + index) + 1)) {
+			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), under_ghost[index]);
+			++(*(ghost_ys + index));
+			under_ghost[index] = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
+			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
+			return;
+		}
+		break;
+	case LEFT:
+		if (can_walk(map, *(ghost_xs + index) - 1, *(ghost_ys + index))) {
+			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), under_ghost[index]);
+			--(*(ghost_xs + index));
+			under_ghost[index] = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
+			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
+			return;
+		}
+		break;
+	case RIGHT:
+		if (can_walk(map, *(ghost_xs + index) + 1, *(ghost_ys + index))) {
+			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), under_ghost[index]);
+			++(*(ghost_xs + index));
+			under_ghost[index] = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
+			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
+			return;
+		}
+		break;
+	}
+
+	randomly_change_direction(map, *(ghost_xs + index), *(ghost_ys + index));
+	ghost = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
+
+	if (can_walk(map, *(ghost_xs + index), *(ghost_ys + index) - 1)) {
+		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), under_ghost[index]);
+		--(*(ghost_ys + index));
+		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
+	}
+	if (can_walk(map, *(ghost_xs + index), *(ghost_ys + index) + 1)) {
+		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), under_ghost[index]);
+		++(*(ghost_ys + index));
+		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
+	}
+	if (can_walk(map, *(ghost_xs + index) - 1, *(ghost_ys + index))) {
+		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), under_ghost[index]);
+		--(*(ghost_xs + index));
+		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
+	}
+	if (can_walk(map, *(ghost_xs + index) + 1, *(ghost_ys + index))) {
+		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), under_ghost[index]);
+		++(*(ghost_xs + index));
+		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
+	}
 }
 
 void pacman_task()
 {
 	int pacman = map_get_sprite(map, pacman_x, pacman_y);
-	int pacman_direction = sprite_direction(pacman);
+	int direction = sprite_direction(pacman);
 
 	printf("key: %x\n", key);
-	printf("direction: %x\n", pacman_direction >> SPRITE_DIRECTION_SHIFT);
+	printf("direction: %x\n", direction >> SPRITE_DIRECTION_SHIFT);
 
-	if (key == ARROW_UP && pacman_direction != UP) {
+	if (key == ARROW_UP && direction != UP) {
 		map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN | UP));
-	} else if (key == ARROW_DOWN && pacman_direction != DOWN) {
+	} else if (key == ARROW_DOWN && direction != DOWN) {
 		map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN | DOWN));
-	} else if (key == ARROW_LEFT && pacman_direction != LEFT) {
+	} else if (key == ARROW_LEFT && direction != LEFT) {
 		map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN | LEFT));
-	} else if (key == ARROW_RIGHT && pacman_direction != RIGHT) {
+	} else if (key == ARROW_RIGHT && direction != RIGHT) {
 		map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN | RIGHT));
 	}
 
 	pacman = map_get_sprite(map, pacman_x, pacman_y);
-	pacman_direction = sprite_direction(pacman);
+	direction = sprite_direction(pacman);
 
-	switch (pacman_direction) {
+	switch (direction) {
 	case UP:
 		if (can_walk(map, pacman_x, pacman_y - 1)) {
 			map_set_sprite(map, pacman_x, pacman_y, BACKGROUND);
@@ -224,6 +286,12 @@ void pacman_task()
 		break;
 	}
 
+	for (int i = 0; i < 4; ++i) {
+		ghost_go(map, i);
+	}
+
+	printf("(%d, %d): %x\n", ghost_xs[0], ghost_ys[0], map_get_sprite(map, ghost_xs[0], ghost_ys[0]));
+
 	animate_map(map);
 	spu_set_map(map);
 }
@@ -247,10 +315,10 @@ int main()
 	printf("PacPac\n");
 	test_map(map);
 	map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN));
-	map_set_sprite(map, red_ghost_x, red_ghost_y, get_sprite(RED | GHOST | UP));
-	map_set_sprite(map, pink_ghost_x, pink_ghost_y, get_sprite(PINK | GHOST | UP));
-	map_set_sprite(map, cyan_ghost_x, cyan_ghost_y, get_sprite(CYAN | GHOST | UP));
-	map_set_sprite(map, teal_ghost_x, teal_ghost_y, get_sprite(TEAL | GHOST | UP));
+	map_set_sprite(map, ghost_xs[0], ghost_ys[0], get_sprite(RED | GHOST | UP));
+	map_set_sprite(map, ghost_xs[1], ghost_ys[1], get_sprite(PINK | GHOST | UP));
+	map_set_sprite(map, ghost_xs[2], ghost_ys[2], get_sprite(CYAN | GHOST | UP));
+	map_set_sprite(map, ghost_xs[3], ghost_ys[3], get_sprite(TEAL | GHOST | UP));
 	spu_set_map(map);
 
 	for (int i = 0; ; ++i) {

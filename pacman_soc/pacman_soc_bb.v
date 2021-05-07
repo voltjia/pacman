@@ -1,14 +1,11 @@
 
 module pacman_soc (
 	clk_clk,
-	gpio_0_in_port,
-	gpio_0_out_port,
-	gpio_1_in_port,
-	gpio_1_out_port,
-	gpio_2_in_port,
-	gpio_2_out_port,
-	gpio_3_in_port,
-	gpio_3_out_port,
+	control_export,
+	hex_digits_export,
+	key_external_connection_export,
+	keycode_export,
+	leds_export,
 	reset_reset_n,
 	sdram_clk_clk,
 	sdram_wire_addr,
@@ -26,18 +23,14 @@ module pacman_soc (
 	spi_SS_n,
 	usb_gpx_export,
 	usb_irq_export,
-	usb_rst_export,
-	control_export);	
+	usb_rst_export);	
 
 	input		clk_clk;
-	input	[31:0]	gpio_0_in_port;
-	output	[31:0]	gpio_0_out_port;
-	input	[31:0]	gpio_1_in_port;
-	output	[31:0]	gpio_1_out_port;
-	input	[31:0]	gpio_2_in_port;
-	output	[31:0]	gpio_2_out_port;
-	input	[31:0]	gpio_3_in_port;
-	output	[31:0]	gpio_3_out_port;
+	output	[31:0]	control_export;
+	output	[15:0]	hex_digits_export;
+	input	[1:0]	key_external_connection_export;
+	output	[7:0]	keycode_export;
+	output	[13:0]	leds_export;
 	input		reset_reset_n;
 	output		sdram_clk_clk;
 	output	[12:0]	sdram_wire_addr;
@@ -56,5 +49,4 @@ module pacman_soc (
 	input		usb_gpx_export;
 	input		usb_irq_export;
 	output		usb_rst_export;
-	output	[31:0]	control_export;
 endmodule
