@@ -247,6 +247,7 @@ int main()
 	map_set_sprite(map, pink_ghost_x, pink_ghost_y, get_sprite(PINK | GHOST | UP));
 	map_set_sprite(map, cyan_ghost_x, cyan_ghost_y, get_sprite(CYAN | GHOST | UP));
 	map_set_sprite(map, teal_ghost_x, teal_ghost_y, get_sprite(TEAL | GHOST | UP));
+	game_over(map);
 	spu_set_map(map);
 
 	for (int i = 0; ; ++i) {

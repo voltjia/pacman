@@ -74,5 +74,7 @@ int next_sprite(int sprite);
 int animate_map(int *map);
 int random_sprite();
 void random_map(int *map);
+void test_map(int *map);
+void game_over(int *map);
 
 #endif /* PACMAN_H_ */
