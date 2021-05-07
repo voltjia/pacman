@@ -344,7 +344,7 @@ void pacman_task()
 	}
 
 	animate_map(map);
-	if (score == 1000) {
+	if (score == 4145) {
 		you_win(map);
 		is_game_over = 1;
 	}
