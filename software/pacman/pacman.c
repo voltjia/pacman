@@ -461,12 +461,14 @@ void you_win(int *map) {
 		map[5 * PACMAN_MAP_WIDTH + x] = get_sprite(PACMAN);
 		map[13 * PACMAN_MAP_WIDTH + x] = get_sprite(PACMAN);
 	}
-	for (int y = 5; y <= 9; ++y)
+	for (int y = 5; y <= 9; ++y) {
 		map[y * PACMAN_MAP_WIDTH + 26] = get_sprite(PACMAN);
 		map[y * PACMAN_MAP_WIDTH + 33] = get_sprite(PACMAN);
-	for (int y = 7; y <= 11; ++y)
+	}
+	for (int y = 7; y <= 11; ++y) {
 		map[y * PACMAN_MAP_WIDTH + 26] = get_sprite(PACMAN);
 		map[y * PACMAN_MAP_WIDTH + 33] = get_sprite(PACMAN);
+	}
 	map[6 * PACMAN_MAP_WIDTH + 17] = get_sprite(PACMAN);
 	map[6 * PACMAN_MAP_WIDTH + 21] = get_sprite(PACMAN);
 	map[12 * PACMAN_MAP_WIDTH + 17] = get_sprite(PACMAN);
