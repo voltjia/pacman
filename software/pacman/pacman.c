@@ -236,14 +236,108 @@ void test_map(int *map)
 		map[y * PACMAN_MAP_WIDTH] = get_sprite(WALL);
 		map[y * PACMAN_MAP_WIDTH + PACMAN_MAP_WIDTH - 1] = get_sprite(WALL);
 	}
-	for (int x = 17; x <= 21; ++x)
-		map[13 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
-	for (int x = 17; x <= 21; ++x)
-		map[10 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
-	for (int y = 10; y <= 12; ++y)
+	for (int x = 17; x <= 22; ++x) {
+		map[9 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+		map[12 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	}
+	for (int y = 10; y <= 11; ++y) {
 		map[y * PACMAN_MAP_WIDTH + 17] = get_sprite(WALL);
-	for (int y = 10; y <= 12; ++y)
-		map[y * PACMAN_MAP_WIDTH + 21] = get_sprite(WALL);
-	for (int x = 18; x <= 20; ++x)
+		map[y * PACMAN_MAP_WIDTH + 22] = get_sprite(WALL);
+	}
+	for (int x = 19; x <= 20; ++x)
+		map[9 * PACMAN_MAP_WIDTH + x] = get_sprite(BACKGROUND);
+	for (int x = 18; x <= 21; ++x) {
+		map[10 * PACMAN_MAP_WIDTH + x] = get_sprite(BACKGROUND);
 		map[11 * PACMAN_MAP_WIDTH + x] = get_sprite(BACKGROUND);
+	}
+	for (int y = 1; y <= 3; ++y) {
+		map[y * PACMAN_MAP_WIDTH + 4] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 35] = get_sprite(WALL);
+	}
+	for (int x = 5; x <= 7; ++x)
+		map[3 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	for (int x = 11; x <= 17; ++x)
+		map[3 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	for (int x = 22; x <= 28; ++x)
+		map[3 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	for (int x = 32; x <= 34; ++x)
+		map[3 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	for (int x = 4; x <= 8; ++x)
+		map[6 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	for (int x = 14; x <= 25; ++x)
+		map[6 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	for (int x = 31; x <= 35; ++x)
+		map[6 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	for (int x = 4; x <= 6; ++x)
+		map[7 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	for (int x = 33; x <= 35; ++x)
+		map[7 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	for (int x = 4; x <= 5; ++x)
+		map[8 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	for (int x = 34; x <= 35; ++x)
+		map[8 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	for (int y = 9; y <= 10; ++y) {
+		map[y * PACMAN_MAP_WIDTH + 4] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 35] = get_sprite(WALL);
+	}
+	for (int y = 11; y <= 16; ++y) {
+		map[y * PACMAN_MAP_WIDTH + 9] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 30] = get_sprite(WALL);
+	}
+	for (int y = 11; y <= 15; ++y) {
+		map[y * PACMAN_MAP_WIDTH + 12] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 27] = get_sprite(WALL);
+	}
+	for (int y = 13; y <= 15; ++y) {
+		map[y * PACMAN_MAP_WIDTH + 11] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 13] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 26] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 28] = get_sprite(WALL);
+	}
+	map[14 * PACMAN_MAP_WIDTH + 12] = get_sprite(BACKGROUND);
+	map[14 * PACMAN_MAP_WIDTH + 27] = get_sprite(BACKGROUND);
+	for (int x = 10; x <= 11; ++x) 
+		map[11 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	for (int x = 28; x <= 29; ++x) 
+		map[11 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	for (int x = 4; x <= 8; ++x) 
+		map[16 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	for (int x = 31; x <= 35; ++x) 
+		map[16 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	for (int x = 12; x <= 14; ++x) 
+		map[16 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	for (int x = 25; x <= 27; ++x) 
+		map[16 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	for (int y = 17; y <= 18; ++y) {
+		map[y * PACMAN_MAP_WIDTH + 15] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 24] = get_sprite(WALL);
+	}
+	for (int x = 3; x <= 7; ++x) 
+		map[21 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	for (int x = 32; x <= 36; ++x) 
+		map[21 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	for (int y = 19; y <= 25; ++y) {
+		map[y * PACMAN_MAP_WIDTH + 8] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 31] = get_sprite(WALL);
+	}
+	for (int y = 21; y <= 23; ++y) {
+		map[y * PACMAN_MAP_WIDTH + 12] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 27] = get_sprite(WALL);
+	}
+	map[23 * PACMAN_MAP_WIDTH + 13] = get_sprite(WALL);
+	map[23 * PACMAN_MAP_WIDTH + 26] = get_sprite(WALL);
+	for (int y = 19; y <= 23; ++y) {
+		map[y * PACMAN_MAP_WIDTH + 19] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 20] = get_sprite(WALL);
+	}
+	for (int x = 12; x <= 27; ++x) 
+		map[24 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	map[24 * PACMAN_MAP_WIDTH + 7] = get_sprite(WALL);
+	map[24 * PACMAN_MAP_WIDTH + 32] = get_sprite(WALL);
+	map[25 * PACMAN_MAP_WIDTH + 6] = get_sprite(WALL);
+	map[25 * PACMAN_MAP_WIDTH + 33] = get_sprite(WALL);
+	map[26 * PACMAN_MAP_WIDTH + 5] = get_sprite(WALL);
+	map[26 * PACMAN_MAP_WIDTH + 34] = get_sprite(WALL);
+	map[27 * PACMAN_MAP_WIDTH + 4] = get_sprite(WALL);
+	map[27 * PACMAN_MAP_WIDTH + 35] = get_sprite(WALL);
 }
