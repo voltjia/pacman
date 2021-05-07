@@ -156,6 +156,16 @@ void setKeycode(WORD keycode)
 	IOWR_ALTERA_AVALON_PIO_DATA(KEYCODE_BASE, keycode);
 }
 
+int can_walk(int *map, int x, int y)
+{
+	if (x == -1 || y == -1 || x == PACMAN_MAP_WIDTH || y == PACMAN_MAP_HEIGHT) {
+		return 0;
+	}
+	int dest_sprite = map_get_sprite(map, x, y);
+	int dest_type = sprite_type(dest_sprite);
+	return dest_type != GHOST && dest_type != WALL;
+}
+
 void pacman_task()
 {
 	int pacman = map_get_sprite(map, pacman_x, pacman_y);
@@ -179,26 +189,26 @@ void pacman_task()
 
 	switch (pacman_direction) {
 	case UP:
-		if (pacman_y > 0) {
-			map_set_sprite(map, pacman_x, pacman_y, BACKGROUND_COLOR);
+		if (can_walk(map, pacman_x, pacman_y - 1)) {
+			map_set_sprite(map, pacman_x, pacman_y, BACKGROUND);
 			map_set_sprite(map, pacman_x, --pacman_y, pacman);
 		}
 		break;
 	case DOWN:
-		if (pacman_y < PACMAN_MAP_HEIGHT - 1) {
-			map_set_sprite(map, pacman_x, pacman_y, BACKGROUND_COLOR);
+		if (can_walk(map, pacman_x, pacman_y + 1)) {
+			map_set_sprite(map, pacman_x, pacman_y, BACKGROUND);
 			map_set_sprite(map, pacman_x, ++pacman_y, pacman);
 		}
 		break;
 	case LEFT:
-		if (pacman_x > 0) {
-			map_set_sprite(map, pacman_x, pacman_y, BACKGROUND_COLOR);
+		if (can_walk(map, pacman_x - 1, pacman_y)) {
+			map_set_sprite(map, pacman_x, pacman_y, BACKGROUND);
 			map_set_sprite(map, --pacman_x, pacman_y, pacman);
 		}
 		break;
 	case RIGHT:
-		if (pacman_x < PACMAN_MAP_WIDTH - 1) {
-			map_set_sprite(map, pacman_x, pacman_y, BACKGROUND_COLOR);
+		if (can_walk(map, pacman_x + 1, pacman_y)) {
+			map_set_sprite(map, pacman_x, pacman_y, BACKGROUND);
 			map_set_sprite(map, ++pacman_x, pacman_y, pacman);
 		}
 		break;
