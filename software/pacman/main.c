@@ -161,6 +161,9 @@ void pacman_task()
 	int pacman = map_get_sprite(map, pacman_x, pacman_y);
 	int pacman_direction = sprite_direction(pacman);
 
+	printf("key: %x\n", key);
+	printf("direction: %x\n", pacman_direction >> SPRITE_DIRECTION_SHIFT);
+
 	if (key == ARROW_UP && pacman_direction != UP) {
 		map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN | UP));
 	} else if (key == ARROW_DOWN && pacman_direction != DOWN) {
@@ -170,6 +173,9 @@ void pacman_task()
 	} else if (key == ARROW_RIGHT && pacman_direction != RIGHT) {
 		map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN | RIGHT));
 	}
+
+	pacman = map_get_sprite(map, pacman_x, pacman_y);
+	pacman_direction = sprite_direction(pacman);
 
 	switch (pacman_direction) {
 	case UP:
