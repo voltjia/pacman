@@ -541,7 +541,7 @@ void two_player_task() {
 
 	score++;
 	animate_map(map);
-	if (score > 500) {
+	if (score > 300) {
 		you_win(map);
 		is_game_over = 1;
 	}

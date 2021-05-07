@@ -3629,10 +3629,10 @@ void init_2game()
  4002324:	010100b4 	movhi	r4,1026
  4002328:	212fcc04 	addi	r4,r4,-16592
  400232c:	40035200 	call	4003520 <map_set_sprite>
-	map_set_sprite(map, ghost_x, ghost_y, get_sprite(RED | GHOST | UP));
+	map_set_sprite(map, ghost_x, ghost_y, get_sprite(RED | GHOST | DOWN));
  4002330:	d4200317 	ldw	r16,-32756(gp)
  4002334:	d4600417 	ldw	r17,-32752(gp)
- 4002338:	01000074 	movhi	r4,1
+ 4002338:	010000b4 	movhi	r4,2
  400233c:	210c4004 	addi	r4,r4,12544
  4002340:	40033f00 	call	40033f0 <get_sprite>
  4002344:	100f883a 	mov	r7,r2
