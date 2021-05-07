@@ -334,7 +334,7 @@ void pacman_task()
 	}
 
 	animate_map(map);
-	if (score == 4150)
+	if (score == 4145)
 		you_win(map);
 	show_score(map, score);
 	spu_set_map(map);
