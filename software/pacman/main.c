@@ -48,6 +48,8 @@ int ghost_ys[4] = {10, 10, 11, 11};
 
 int score = 0;
 
+int is_game_over = 0;
+
 BYTE GetDriverandReport()
 {
 	BYTE i;
@@ -184,6 +186,7 @@ void ghost_go(int *map, int index)
 			under_ghost[index] = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
 			if (sprite_type(under_ghost[index]) == PACMAN) {
 				game_over(map);
+				is_game_over = 1;
 			}
 			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
 			return;
@@ -196,6 +199,7 @@ void ghost_go(int *map, int index)
 			under_ghost[index] = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
 			if (sprite_type(under_ghost[index]) == PACMAN) {
 				game_over(map);
+				is_game_over = 1;
 			}
 			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
 			return;
@@ -208,6 +212,7 @@ void ghost_go(int *map, int index)
 			under_ghost[index] = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
 			if (sprite_type(under_ghost[index]) == PACMAN) {
 				game_over(map);
+				is_game_over = 1;
 			}
 			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
 			return;
@@ -220,6 +225,7 @@ void ghost_go(int *map, int index)
 			under_ghost[index] = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
 			if (sprite_type(under_ghost[index]) == PACMAN) {
 				game_over(map);
+				is_game_over = 1;
 			}
 			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
 			return;
@@ -236,6 +242,7 @@ void ghost_go(int *map, int index)
 		under_ghost[index] = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
 		if (sprite_type(under_ghost[index]) == PACMAN) {
 			game_over(map);
+			is_game_over = 1;
 		}
 		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
 	} else if (can_walk(map, *(ghost_xs + index), *(ghost_ys + index) + 1)) {
@@ -244,6 +251,7 @@ void ghost_go(int *map, int index)
 		under_ghost[index] = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
 		if (sprite_type(under_ghost[index]) == PACMAN) {
 			game_over(map);
+			is_game_over = 1;
 		}
 		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
 	} else if (can_walk(map, *(ghost_xs + index) - 1, *(ghost_ys + index))) {
@@ -252,6 +260,7 @@ void ghost_go(int *map, int index)
 		under_ghost[index] = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
 		if (sprite_type(under_ghost[index]) == PACMAN) {
 			game_over(map);
+			is_game_over = 1;
 		}
 		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
 	} else if (can_walk(map, *(ghost_xs + index) + 1, *(ghost_ys + index))) {
@@ -260,6 +269,7 @@ void ghost_go(int *map, int index)
 		under_ghost[index] = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
 		if (sprite_type(under_ghost[index]) == PACMAN) {
 			game_over(map);
+			is_game_over = 1;
 		}
 		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
 	}
@@ -334,8 +344,10 @@ void pacman_task()
 	}
 
 	animate_map(map);
-	if (score == 4150)
+	if (score == 1000) {
 		you_win(map);
+		is_game_over = 1;
+	}
 	show_score(map, score);
 	spu_set_map(map);
 }
@@ -373,7 +385,8 @@ int main()
 	for (int i = 0; ; ++i) {
 		MAX3421E_Task();
 		USB_Task();
-		pacman_task();
+		if (!is_game_over)
+			pacman_task();
 		//usleep (500000);
 		if (GetUsbTaskState() == USB_STATE_RUNNING) {
 			if (!runningdebugflag) {

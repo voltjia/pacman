@@ -444,6 +444,11 @@ void game_over(int *map)
 }
 
 void you_win(int *map) {
+	for (int y = 0; y < PACMAN_MAP_HEIGHT; ++y) {
+		for (int x = 0; x < PACMAN_MAP_WIDTH; ++x) {
+			map[y * PACMAN_MAP_WIDTH + x] = get_sprite(BACKGROUND);
+		}
+	}
 	map[5 * PACMAN_MAP_WIDTH + 4] = get_sprite(PACMAN);
 	map[6 * PACMAN_MAP_WIDTH + 5] = get_sprite(PACMAN);
 	map[7 * PACMAN_MAP_WIDTH + 6] = get_sprite(PACMAN);
