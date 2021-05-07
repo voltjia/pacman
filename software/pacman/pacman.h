@@ -1,7 +1,7 @@
 /*
  * pacman.h
  *
- *  Created on: 2021Äê4ÔÂ30ÈÕ
+ *  Created on: 2021ï¿½ï¿½4ï¿½ï¿½30ï¿½ï¿½
  *      Author: user
  */
 
@@ -36,7 +36,7 @@
 #define RED (3 << SPRITE_PROPERTY_SHIFT)
 #define PINK (4 << SPRITE_PROPERTY_SHIFT)
 #define CYAN (5 << SPRITE_PROPERTY_SHIFT)
-#define STEEL (6 << SPRITE_PROPERTY_SHIFT)
+#define TEAL (6 << SPRITE_PROPERTY_SHIFT)
 #define BLUE (7 << SPRITE_PROPERTY_SHIFT)
 #define EYES_ONLY (13 << SPRITE_PROPERTY_SHIFT)
 #define SMALL (14 << SPRITE_PROPERTY_SHIFT)
