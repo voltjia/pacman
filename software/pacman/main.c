@@ -163,7 +163,7 @@ void setKeycode(WORD keycode)
 
 void randomly_change_direction(int *map, int x, int y) {
 	int sprite = map_get_sprite(map, x, y);
-	map_set_sprite(map, x, y, (sprite & ~SPRITE_DIRECTION_MASK) | ((rand() % 4 + 1) << SPRITE_DIRECTION_SHIFT));
+	map_set_sprite(map, x, y, get_sprite((sprite & ~SPRITE_DIRECTION_MASK) | ((rand() % 4 + 1) << SPRITE_DIRECTION_SHIFT)));
 }
 
 void ghost_go(int *map, int index)
