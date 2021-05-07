@@ -218,7 +218,7 @@ void random_map(int *map)
 	}
 }
 
-void test_map(int *map)
+void main_map(int *map)
 {
 	for (int y = 0; y < PACMAN_MAP_HEIGHT; ++y) {
 		for (int x = 0; x < PACMAN_MAP_WIDTH; ++x) {

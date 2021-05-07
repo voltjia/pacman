@@ -352,13 +352,38 @@ void pacman_task()
 	spu_set_map(map);
 }
 
+void init_game()
+{
+	pacman_x = 19;
+	pacman_y = 28;
+	under_ghost[0] = -1;
+	under_ghost[1] = -1;
+	under_ghost[2] = -1;
+	under_ghost[3] = -1;
+	ghost_xs[0] = 19;
+	ghost_xs[1] = 20;
+	ghost_xs[2] = 18;
+	ghost_xs[3] = 21;
+	ghost_ys[0] = 10;
+	ghost_ys[1] = 10;
+	ghost_ys[2] = 11;
+	ghost_ys[3] = 11;
+
+	main_map(map);
+	map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN));
+	map_set_sprite(map, ghost_xs[0], ghost_ys[0], get_sprite(RED | GHOST | UP));
+	map_set_sprite(map, ghost_xs[1], ghost_ys[1], get_sprite(PINK | GHOST | UP));
+	map_set_sprite(map, ghost_xs[2], ghost_ys[2], get_sprite(CYAN | GHOST | UP));
+	map_set_sprite(map, ghost_xs[3], ghost_ys[3], get_sprite(TEAL | GHOST | UP));
+	spu_set_map(map);
+
+	score = 0;
+
+	is_game_over = 0;
+}
+
 int main()
 {
-	/*
-	spawn_all_sprites(map);
-	spu_set_map(map);
-	for (;;) {}
-	*/
 	srand (time(NULL));
 
 	BYTE rcode;
@@ -374,7 +399,8 @@ int main()
 	USB_init();
 
 	printf("PacPac\n");
-	test_map(map);
+
+	main_map(map);
 	map_set_sprite(map, pacman_x, pacman_y, get_sprite(PACMAN));
 	map_set_sprite(map, ghost_xs[0], ghost_ys[0], get_sprite(RED | GHOST | UP));
 	map_set_sprite(map, ghost_xs[1], ghost_ys[1], get_sprite(PINK | GHOST | UP));
@@ -385,8 +411,13 @@ int main()
 	for (int i = 0; ; ++i) {
 		MAX3421E_Task();
 		USB_Task();
-		if (!is_game_over)
+		if (key == 0x28) {
+			init_game();
+			printf("idfyadsfuyhsgbduhyfgsbduyfgdsy\n");
+		}
+		if (!is_game_over) {
 			pacman_task();
+		}
 		//usleep (500000);
 		if (GetUsbTaskState() == USB_STATE_RUNNING) {
 			if (!runningdebugflag) {
@@ -408,8 +439,8 @@ int main()
 					printf("%x ", kbdbuf.keycode[n]);
 				}
 				BYTE temp = kbdbuf.keycode[0];
-				if (temp == 0x52 || temp == 0x51 || temp == 0x50 || temp == 0x4f)
-					key = temp;
+				//if (temp == 0x52 || temp == 0x51 || temp == 0x50 || temp == 0x4f)
+				key = temp;
 //				setKeycode(kbdbuf.keycode[0]);
 //				printSignedHex0(kbdbuf.keycode[0]);
 //				printSignedHex1(kbdbuf.keycode[1]);
