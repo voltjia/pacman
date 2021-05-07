@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include "pacman.h"
 #include "spu.h"
 #include "system.h"
@@ -228,6 +230,8 @@ void pacman_task()
 
 int main()
 {
+	srand (time(NULL));
+
 	BYTE rcode;
 	BOOT_MOUSE_REPORT buf;		//USB mouse report
 	BOOT_KBD_REPORT kbdbuf;

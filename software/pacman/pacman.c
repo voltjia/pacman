@@ -152,6 +152,66 @@ int random_sprite()
 		| (rand() % SPRITE_DIRECTION_SIZE << SPRITE_DIRECTION_SHIFT));
 }
 
+void connect_walls(int *walls, int src, int dst)
+{
+	for (int y = 0; y < PACMAN_MAP_HEIGHT; ++y) {
+		for (int x = 0; x < PACMAN_MAP_WIDTH; ++x) {
+			if (walls[y * PACMAN_MAP_WIDTH + x] == src) {
+				walls[y * PACMAN_MAP_WIDTH + x] = dst;
+			}
+		}
+	}
+}
+
+void random_walls(int *map)
+{
+	int walls[1200] = {0};
+	int index = 1;
+	for (int i = 0; i < 1024; ++i) {
+		int connected[1200] = {0};
+		int x = rand() % (PACMAN_MAP_WIDTH - 2) + 2;
+		int y = rand() % (PACMAN_MAP_HEIGHT - 2) + 2;
+		if (walls[y * PACMAN_MAP_WIDTH + x] != 0) {
+			continue;
+		}
+		int is_closed = 0;
+		int count = 0;
+		int connected_indices[8] = {0};
+		for (int j = y - 1; j < y + 2; ++j) {
+			for (int i = x - 1; i < x + 2; ++i) {
+				if (walls[j * PACMAN_MAP_WIDTH + i] != 0) {
+					if (connected[walls[j * PACMAN_MAP_WIDTH + i]]) {
+						is_closed = 1;
+						break;
+					}
+					connected[walls[j * PACMAN_MAP_WIDTH + i]] = 1;
+					connected_indices[count++] = walls[j * PACMAN_MAP_WIDTH + i];
+				}
+			}
+			if (is_closed) {
+				break;
+			}
+		}
+		if (count == 0) {
+			walls[y * PACMAN_MAP_WIDTH + x] = index++;
+			continue;
+		}
+		if (is_closed) {
+			continue;
+		}
+		for (int i = 1; i < count; ++i) {
+			connect_walls(walls, connected_indices[i], connected_indices[0]);
+		}
+	}
+
+	for (int y = 0; y < PACMAN_MAP_HEIGHT; ++y) {
+		for (int x = 0; x < PACMAN_MAP_WIDTH; ++x) {
+			if (walls[y * PACMAN_MAP_WIDTH + x])
+				map_set_sprite(map, x, y, get_sprite(WALL));
+		}
+	}
+}
+
 void random_map(int *map)
 {
 	for (int y = 0; y < PACMAN_MAP_HEIGHT; ++y) {
