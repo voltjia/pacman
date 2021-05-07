@@ -405,10 +405,10 @@ void game_over(int *map)
 		map[22 * PACMAN_MAP_WIDTH + x] = get_sprite(PACMAN);
 		map[26 * PACMAN_MAP_WIDTH + x] = get_sprite(PACMAN);
 	}
-	for (int x = 31; x <= 34; ++x) {
+	for (int x = 31; x <= 34; ++x)
 		map[18 * PACMAN_MAP_WIDTH + x] = get_sprite(PACMAN);
+	for (int x = 31; x <= 35; ++x)
 		map[22 * PACMAN_MAP_WIDTH + x] = get_sprite(PACMAN);
-	}
 	for (int y = 18; y <= 26; ++y)
 		map[y * PACMAN_MAP_WIDTH + 21] = get_sprite(PACMAN);
 	for (int y = 18; y <= 27; ++y)
@@ -439,11 +439,11 @@ void game_over(int *map)
 	map[25 * PACMAN_MAP_WIDTH + 7] = get_sprite(PACMAN);
 	for (int x = 4; x <= 6; ++x)
 		map[26 * PACMAN_MAP_WIDTH + x] = get_sprite(PACMAN);
-	for (int x = 35; x <= 36; ++x)
-		map[26 * PACMAN_MAP_WIDTH + x] = get_sprite(PACMAN);
 	map[23 * PACMAN_MAP_WIDTH + 32] = get_sprite(PACMAN);
 	map[24 * PACMAN_MAP_WIDTH + 33] = get_sprite(PACMAN);
 	map[25 * PACMAN_MAP_WIDTH + 34] = get_sprite(PACMAN);
+	map[26 * PACMAN_MAP_WIDTH + 35] = get_sprite(PACMAN);
+	map[27 * PACMAN_MAP_WIDTH + 36] = get_sprite(PACMAN);
 }
 
 void you_win(int *map) {
