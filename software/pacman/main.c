@@ -413,7 +413,6 @@ int main()
 		USB_Task();
 		if (key == 0x28) {
 			init_game();
-			printf("idfyadsfuyhsgbduhyfgsbduyfgdsy\n");
 		}
 		if (!is_game_over) {
 			pacman_task();
