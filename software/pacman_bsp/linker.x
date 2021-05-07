@@ -4,7 +4,7 @@
  * Machine generated for CPU 'nios2_processor' in SOPC Builder design 'pacman_soc'
  * SOPC Builder design path: ../../pacman_soc.sopcinfo
  *
- * Generated: Fri May 07 16:02:57 CST 2021
+ * Generated: Fri May 07 21:43:43 CST 2021
  */
 
 /*
@@ -50,7 +50,7 @@
 
 MEMORY
 {
-    onchip_memory : ORIGIN = 0x0, LENGTH = 4096
+    onchip_memory : ORIGIN = 0x0, LENGTH = 131072
     reset : ORIGIN = 0x4000000, LENGTH = 32
     sdram : ORIGIN = 0x4000020, LENGTH = 67108832
 }

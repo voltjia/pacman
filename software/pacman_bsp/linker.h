@@ -4,7 +4,7 @@
  * Machine generated for CPU 'nios2_processor' in SOPC Builder design 'pacman_soc'
  * SOPC Builder design path: ../../pacman_soc.sopcinfo
  *
- * Generated: Fri May 07 16:02:57 CST 2021
+ * Generated: Fri May 07 21:43:43 CST 2021
  */
 
 /*
@@ -66,7 +66,7 @@
  */
 
 #define ONCHIP_MEMORY_REGION_BASE 0x0
-#define ONCHIP_MEMORY_REGION_SPAN 4096
+#define ONCHIP_MEMORY_REGION_SPAN 131072
 #define RESET_REGION_BASE 0x4000000
 #define RESET_REGION_SPAN 32
 #define SDRAM_REGION_BASE 0x4000020

@@ -3,7 +3,7 @@
 # Machine generated for CPU 'nios2_processor' in SOPC Builder design 'pacman_soc'
 # SOPC Builder design path: ../../pacman_soc.sopcinfo
 #
-# Generated: Fri May 07 16:02:57 CST 2021
+# Generated: Fri May 07 21:43:43 CST 2021
 
 # DO NOT MODIFY THIS FILE
 #
@@ -47,7 +47,7 @@
 # by allowing GDB to cache memory contents on the host.
 
 # onchip_memory
-memory 0x0 0x1000 cache
+memory 0x0 0x20000 cache
 
 # sdram
 memory 0x4000000 0x8000000 cache

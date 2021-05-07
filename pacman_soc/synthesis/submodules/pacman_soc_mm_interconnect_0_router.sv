@@ -134,7 +134,7 @@ module pacman_soc_mm_interconnect_0_router
     // Figure out the number of bits to mask off for each slave span
     // during address decoding
     // -------------------------------------------------------
-    localparam PAD0 = log2ceil(64'h1000 - 64'h0); 
+    localparam PAD0 = log2ceil(64'h20000 - 64'h0); 
     localparam PAD1 = log2ceil(64'h8000000 - 64'h4000000); 
     localparam PAD2 = log2ceil(64'h8001000 - 64'h8000800); 
     localparam PAD3 = log2ceil(64'h8001080 - 64'h8001040); 
@@ -208,7 +208,7 @@ module pacman_soc_mm_interconnect_0_router
         // Sets the channel and destination ID based on the address
         // --------------------------------------------------
 
-    // ( 0x0 .. 0x1000 )
+    // ( 0x0 .. 0x20000 )
     if ( {address[RG:PAD0],{PAD0{1'b0}}} == 28'h0   ) begin
             src_channel = 16'b0100000000000000;
             src_data[PKT_DEST_ID_H:PKT_DEST_ID_L] = 7;

@@ -112,7 +112,7 @@ module pacman_soc (
 	wire  [31:0] mm_interconnect_0_control_s1_writedata;                        // mm_interconnect_0:control_s1_writedata -> control:writedata
 	wire         mm_interconnect_0_onchip_memory_s1_chipselect;                 // mm_interconnect_0:onchip_memory_s1_chipselect -> onchip_memory:chipselect
 	wire  [31:0] mm_interconnect_0_onchip_memory_s1_readdata;                   // onchip_memory:readdata -> mm_interconnect_0:onchip_memory_s1_readdata
-	wire   [9:0] mm_interconnect_0_onchip_memory_s1_address;                    // mm_interconnect_0:onchip_memory_s1_address -> onchip_memory:address
+	wire  [14:0] mm_interconnect_0_onchip_memory_s1_address;                    // mm_interconnect_0:onchip_memory_s1_address -> onchip_memory:address
 	wire   [3:0] mm_interconnect_0_onchip_memory_s1_byteenable;                 // mm_interconnect_0:onchip_memory_s1_byteenable -> onchip_memory:byteenable
 	wire         mm_interconnect_0_onchip_memory_s1_write;                      // mm_interconnect_0:onchip_memory_s1_write -> onchip_memory:write
 	wire  [31:0] mm_interconnect_0_onchip_memory_s1_writedata;                  // mm_interconnect_0:onchip_memory_s1_writedata -> onchip_memory:writedata

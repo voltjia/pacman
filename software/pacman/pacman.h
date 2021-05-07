@@ -76,5 +76,6 @@ int random_sprite();
 void random_map(int *map);
 void test_map(int *map);
 void game_over(int *map);
+int can_walk(int *map, int x, int y);
 
 #endif /* PACMAN_H_ */
