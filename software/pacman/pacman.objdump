@@ -37,49 +37,49 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   9 .debug_aranges 000010b0  00000000  00000000  0001b768  2**3
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_info   00029771  00000000  00000000  0001c818  2**0
+ 10 .debug_info   0002972f  00000000  00000000  0001c818  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_abbrev 0000a596  00000000  00000000  00045f89  2**0
+ 11 .debug_abbrev 0000a596  00000000  00000000  00045f47  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_line   0000d721  00000000  00000000  0005051f  2**0
+ 12 .debug_line   0000d721  00000000  00000000  000504dd  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_frame  00002f58  00000000  00000000  0005dc40  2**2
+ 13 .debug_frame  00002f58  00000000  00000000  0005dc00  2**2
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_str    00004715  00000000  00000000  00060b98  2**0
+ 14 .debug_str    000046a3  00000000  00000000  00060b58  2**0
                   CONTENTS, READONLY, DEBUGGING
- 15 .debug_loc    00017d3c  00000000  00000000  000652ad  2**0
+ 15 .debug_loc    00017d3c  00000000  00000000  000651fb  2**0
                   CONTENTS, READONLY, DEBUGGING
- 16 .debug_alt_sim_info 00000040  00000000  00000000  0007cfec  2**2
+ 16 .debug_alt_sim_info 00000040  00000000  00000000  0007cf38  2**2
                   CONTENTS, READONLY, DEBUGGING
- 17 .debug_ranges 000019b0  00000000  00000000  0007d030  2**3
+ 17 .debug_ranges 000019b0  00000000  00000000  0007cf78  2**3
                   CONTENTS, READONLY, DEBUGGING
- 18 .thread_model 00000003  00000000  00000000  00082916  2**0
+ 18 .thread_model 00000003  00000000  00000000  0008285e  2**0
                   CONTENTS, READONLY
- 19 .cpu          0000000f  00000000  00000000  00082919  2**0
+ 19 .cpu          0000000f  00000000  00000000  00082861  2**0
                   CONTENTS, READONLY
- 20 .qsys         00000001  00000000  00000000  00082928  2**0
+ 20 .qsys         00000001  00000000  00000000  00082870  2**0
                   CONTENTS, READONLY
- 21 .simulation_enabled 00000001  00000000  00000000  00082929  2**0
+ 21 .simulation_enabled 00000001  00000000  00000000  00082871  2**0
                   CONTENTS, READONLY
- 22 .sysid_hash   00000004  00000000  00000000  0008292a  2**0
+ 22 .sysid_hash   00000004  00000000  00000000  00082872  2**0
                   CONTENTS, READONLY
- 23 .sysid_base   00000004  00000000  00000000  0008292e  2**0
+ 23 .sysid_base   00000004  00000000  00000000  00082876  2**0
                   CONTENTS, READONLY
- 24 .sysid_time   00000004  00000000  00000000  00082932  2**0
+ 24 .sysid_time   00000004  00000000  00000000  0008287a  2**0
                   CONTENTS, READONLY
- 25 .stderr_dev   00000009  00000000  00000000  00082936  2**0
+ 25 .stderr_dev   00000009  00000000  00000000  0008287e  2**0
                   CONTENTS, READONLY
- 26 .stdin_dev    00000009  00000000  00000000  0008293f  2**0
+ 26 .stdin_dev    00000009  00000000  00000000  00082887  2**0
                   CONTENTS, READONLY
- 27 .stdout_dev   00000009  00000000  00000000  00082948  2**0
+ 27 .stdout_dev   00000009  00000000  00000000  00082890  2**0
                   CONTENTS, READONLY
- 28 .sopc_system_name 0000000a  00000000  00000000  00082951  2**0
+ 28 .sopc_system_name 0000000a  00000000  00000000  00082899  2**0
                   CONTENTS, READONLY
- 29 .quartus_project_dir 00000026  00000000  00000000  0008295b  2**0
+ 29 .quartus_project_dir 00000010  00000000  00000000  000828a3  2**0
                   CONTENTS, READONLY
- 30 .jdi          0000560b  00000000  00000000  00082981  2**0
+ 30 .jdi          0000560b  00000000  00000000  000828b3  2**0
                   CONTENTS, READONLY
- 31 .sopcinfo     000912bc  00000000  00000000  00087f8c  2**0
+ 31 .sopcinfo     0008c4a8  00000000  00000000  00087ebe  2**0
                   CONTENTS, READONLY
 SYMBOL TABLE:
 04000000 l    d  .entry	00000000 .entry
@@ -9634,6 +9634,12 @@ void spu_set_map(int *map)
  4006630:	f800283a 	ret
 
 04006634 <HIDMProbe>:
+/* HID Mouse probe. Called from USB state machine.                          */
+/* assumes configuration length is less than 256 bytes                      */
+/* looks for Class:03, Subclass: 01, Protocol: 02 in interface descriptor   */
+/* sets mouse in boot protocol                                              */
+/* assumes single configuration and interface configuration 0               */
+BOOL HIDMProbe(BYTE addr, DWORD flags) {
  4006634:	defff204 	addi	sp,sp,-56
  4006638:	dfc00d15 	stw	ra,52(sp)
  400663c:	df000c15 	stw	fp,48(sp)
@@ -9641,12 +9647,19 @@ void spu_set_map(int *map)
  4006644:	2005883a 	mov	r2,r4
  4006648:	e17fff15 	stw	r5,-4(fp)
  400664c:	e0bffe05 	stb	r2,-8(fp)
+	BYTE tmpbyte;
+	BYTE rcode;
+	BYTE confvalue;
+	WORD total_length;
+	USB_DESCR* data_ptr = (USB_DESCR *) &bigbuf;
  4006650:	008100b4 	movhi	r2,1026
  4006654:	10b58d04 	addi	r2,r2,-10700
  4006658:	e0bffa15 	stw	r2,-24(fp)
+	BYTE* byte_ptr = bigbuf;
  400665c:	008100b4 	movhi	r2,1026
  4006660:	10b58d04 	addi	r2,r2,-10700
  4006664:	e0bffb15 	stw	r2,-20(fp)
+	rcode = XferGetConfDescr(addr, 0, CONF_DESCR_LEN, 0, bigbuf); //get configuration descriptor
  4006668:	e0fffe03 	ldbu	r3,-8(fp)
  400666c:	008100b4 	movhi	r2,1026
  4006670:	10b58d04 	addi	r2,r2,-10700
@@ -9663,21 +9676,31 @@ void spu_set_map(int *map)
  400669c:	1809883a 	mov	r4,r3
  40066a0:	40077bc0 	call	40077bc <XferCtrlReq>
  40066a4:	e0bffc05 	stb	r2,-16(fp)
+	if (rcode) {   //error handling
  40066a8:	e0bffc03 	ldbu	r2,-16(fp)
  40066ac:	10000226 	beq	r2,zero,40066b8 <HIDMProbe+0x84>
+		//printf("unable to get configuration descriptor");
+		return (FALSE);
  40066b0:	0005883a 	mov	r2,zero
  40066b4:	0000dc06 	br	4006a28 <HIDMProbe+0x3f4>
+	}
+	if (data_ptr->descr.config.wTotalLength > 256) {
  40066b8:	e0bffa17 	ldw	r2,-24(fp)
  40066bc:	1080008b 	ldhu	r2,2(r2)
  40066c0:	10bfffcc 	andi	r2,r2,65535
  40066c4:	10804070 	cmpltui	r2,r2,257
  40066c8:	1000031e 	bne	r2,zero,40066d8 <HIDMProbe+0xa4>
+		total_length = 256;
  40066cc:	00804004 	movi	r2,256
  40066d0:	e0bff90d 	sth	r2,-28(fp)
  40066d4:	00000306 	br	40066e4 <HIDMProbe+0xb0>
+	} else {
+		total_length = data_ptr->descr.config.wTotalLength;
  40066d8:	e0bffa17 	ldw	r2,-24(fp)
  40066dc:	1080008b 	ldhu	r2,2(r2)
  40066e0:	e0bff90d 	sth	r2,-28(fp)
+	}
+	rcode = XferGetConfDescr(addr, 0, total_length, 0, bigbuf); //get the whole configuration
  40066e4:	e13ffe03 	ldbu	r4,-8(fp)
  40066e8:	e0fff90b 	ldhu	r3,-28(fp)
  40066ec:	008100b4 	movhi	r2,1026
@@ -9693,46 +9716,74 @@ void spu_set_map(int *map)
  4006714:	000b883a 	mov	r5,zero
  4006718:	40077bc0 	call	40077bc <XferCtrlReq>
  400671c:	e0bffc05 	stb	r2,-16(fp)
+	if (rcode) {   //error handling
  4006720:	e0bffc03 	ldbu	r2,-16(fp)
  4006724:	10000226 	beq	r2,zero,4006730 <HIDMProbe+0xfc>
+		//printf("unable to get configuration");
+		return (FALSE);
  4006728:	0005883a 	mov	r2,zero
  400672c:	0000be06 	br	4006a28 <HIDMProbe+0x3f4>
+	}
+	confvalue = data_ptr->descr.config.bConfigurationValue;
  4006730:	e0bffa17 	ldw	r2,-24(fp)
  4006734:	10800143 	ldbu	r2,5(r2)
  4006738:	e0bffc45 	stb	r2,-15(fp)
+	//printf("checking configuration value (length: %d): ",
+	//		data_ptr->descr.config.wTotalLength);
+	//for (int i = 0; i < data_ptr->descr.config.wTotalLength; i++) {
+		//printf("%x ", (unsigned char) (bigbuf[i] & 0xff));
+	//}
+	while (byte_ptr < bigbuf + total_length) {
  400673c:	0000b306 	br	4006a0c <HIDMProbe+0x3d8>
+		if (data_ptr->descr.config.bDescriptorType != USB_DESCRIPTOR_INTERFACE) {
  4006740:	e0bffa17 	ldw	r2,-24(fp)
  4006744:	10800043 	ldbu	r2,1(r2)
  4006748:	10803fcc 	andi	r2,r2,255
  400674c:	10800120 	cmpeqi	r2,r2,4
  4006750:	1000091e 	bne	r2,zero,4006778 <HIDMProbe+0x144>
+			byte_ptr = byte_ptr + data_ptr->descr.config.bLength;
  4006754:	e0bffa17 	ldw	r2,-24(fp)
  4006758:	10800003 	ldbu	r2,0(r2)
  400675c:	10803fcc 	andi	r2,r2,255
  4006760:	e0fffb17 	ldw	r3,-20(fp)
  4006764:	1885883a 	add	r2,r3,r2
  4006768:	e0bffb15 	stw	r2,-20(fp)
+			data_ptr = (USB_DESCR*) byte_ptr;
  400676c:	e0bffb17 	ldw	r2,-20(fp)
  4006770:	e0bffa15 	stw	r2,-24(fp)
  4006774:	0000a506 	br	4006a0c <HIDMProbe+0x3d8>
+		} // if( data_ptr->descr.config.bDescriptorType != USB_DESCRIPTOR_INTERFACE
+		else {
+			//printf("starting interface parsing at byte location %d\n",
+			//		data_ptr->descr.config.bLength);
+			BYTE class = data_ptr->descr.interface.bInterfaceClass;
  4006778:	e0bffa17 	ldw	r2,-24(fp)
  400677c:	10800143 	ldbu	r2,5(r2)
  4006780:	e0bffc85 	stb	r2,-14(fp)
+			BYTE subclass = data_ptr->descr.interface.bInterfaceSubClass;
  4006784:	e0bffa17 	ldw	r2,-24(fp)
  4006788:	10800183 	ldbu	r2,6(r2)
  400678c:	e0bffcc5 	stb	r2,-13(fp)
+			BYTE protocol = data_ptr->descr.interface.bInterfaceProtocol;
  4006790:	e0bffa17 	ldw	r2,-24(fp)
  4006794:	108001c3 	ldbu	r2,7(r2)
  4006798:	e0bffd05 	stb	r2,-12(fp)
+			//printf("class %x, subclass %x, protocol %x,\n", class, subclass,
+			//		protocol);
+			//interface descriptor
+			if (class == HID_INTF && subclass == BOOT_INTF_SUBCLASS
  400679c:	e0bffc83 	ldbu	r2,-14(fp)
  40067a0:	108000d8 	cmpnei	r2,r2,3
  40067a4:	1000971e 	bne	r2,zero,4006a04 <HIDMProbe+0x3d0>
  40067a8:	e0bffcc3 	ldbu	r2,-13(fp)
  40067ac:	10800058 	cmpnei	r2,r2,1
  40067b0:	1000941e 	bne	r2,zero,4006a04 <HIDMProbe+0x3d0>
+					&& protocol == HID_PROTOCOL_MOUSE) {
  40067b4:	e0bffd03 	ldbu	r2,-12(fp)
  40067b8:	10800098 	cmpnei	r2,r2,2
  40067bc:	1000911e 	bne	r2,zero,4006a04 <HIDMProbe+0x3d0>
+				//detected a mouse
+				devtable[addr].devclass = HID_M;                  //device class
  40067c0:	e0fffe03 	ldbu	r3,-8(fp)
  40067c4:	008100b4 	movhi	r2,1026
  40067c8:	10b5cd04 	addi	r2,r2,-10444
@@ -9741,6 +9792,7 @@ void spu_set_map(int *map)
  40067d4:	10800104 	addi	r2,r2,4
  40067d8:	00c00084 	movi	r3,2
  40067dc:	10c00005 	stb	r3,0(r2)
+				tmpbyte = devtable[addr].epinfo->MaxPktSize;
  40067e0:	e0fffe03 	ldbu	r3,-8(fp)
  40067e4:	008100b4 	movhi	r2,1026
  40067e8:	10b5cd04 	addi	r2,r2,-10444
@@ -9749,7 +9801,9 @@ void spu_set_map(int *map)
  40067f4:	10800017 	ldw	r2,0(r2)
  40067f8:	1080008b 	ldhu	r2,2(r2)
  40067fc:	e0bffd45 	stb	r2,-11(fp)
+				HID_init();                         //initialize data structures
  4006800:	4006e440 	call	4006e44 <HID_init>
+				devtable[addr].epinfo = hid_ep; //switch endpoint information structure
  4006804:	e0fffe03 	ldbu	r3,-8(fp)
  4006808:	008100b4 	movhi	r2,1026
  400680c:	10b5cd04 	addi	r2,r2,-10444
@@ -9758,6 +9812,7 @@ void spu_set_map(int *map)
  4006818:	008100b4 	movhi	r2,1026
  400681c:	10b0c904 	addi	r2,r2,-15580
  4006820:	18800015 	stw	r2,0(r3)
+				devtable[addr].epinfo[0].MaxPktSize = tmpbyte;
  4006824:	e0fffe03 	ldbu	r3,-8(fp)
  4006828:	008100b4 	movhi	r2,1026
  400682c:	10b5cd04 	addi	r2,r2,-10444
@@ -9766,34 +9821,54 @@ void spu_set_map(int *map)
  4006838:	10800017 	ldw	r2,0(r2)
  400683c:	e0fffd43 	ldbu	r3,-11(fp)
  4006840:	10c0008d 	sth	r3,2(r2)
+				hid_device.interface =
+						data_ptr->descr.interface.bInterfaceNumber;
  4006844:	e0bffa17 	ldw	r2,-24(fp)
  4006848:	10800083 	ldbu	r2,2(r2)
+				devtable[addr].devclass = HID_M;                  //device class
+				tmpbyte = devtable[addr].epinfo->MaxPktSize;
+				HID_init();                         //initialize data structures
+				devtable[addr].epinfo = hid_ep; //switch endpoint information structure
+				devtable[addr].epinfo[0].MaxPktSize = tmpbyte;
+				hid_device.interface =
  400684c:	d0a6f945 	stb	r2,-25627(gp)
+						data_ptr->descr.interface.bInterfaceNumber;
+				hid_device.addr = addr;
  4006850:	e0bffe03 	ldbu	r2,-8(fp)
  4006854:	d0a6f905 	stb	r2,-25628(gp)
+				byte_ptr = byte_ptr + data_ptr->descr.config.bLength;
  4006858:	e0bffa17 	ldw	r2,-24(fp)
  400685c:	10800003 	ldbu	r2,0(r2)
  4006860:	10803fcc 	andi	r2,r2,255
  4006864:	e0fffb17 	ldw	r3,-20(fp)
  4006868:	1885883a 	add	r2,r3,r2
  400686c:	e0bffb15 	stw	r2,-20(fp)
+				data_ptr = (USB_DESCR*) byte_ptr;
  4006870:	e0bffb17 	ldw	r2,-20(fp)
  4006874:	e0bffa15 	stw	r2,-24(fp)
+				while (byte_ptr < bigbuf + total_length) {
  4006878:	00005b06 	br	40069e8 <HIDMProbe+0x3b4>
+					if (data_ptr->descr.config.bDescriptorType
  400687c:	e0bffa17 	ldw	r2,-24(fp)
  4006880:	10800043 	ldbu	r2,1(r2)
  4006884:	10803fcc 	andi	r2,r2,255
  4006888:	10800160 	cmpeqi	r2,r2,5
  400688c:	1000091e 	bne	r2,zero,40068b4 <HIDMProbe+0x280>
+							!= USB_DESCRIPTOR_ENDPOINT) { //skip to endpoint descriptor
+						byte_ptr = byte_ptr + data_ptr->descr.config.bLength;
  4006890:	e0bffa17 	ldw	r2,-24(fp)
  4006894:	10800003 	ldbu	r2,0(r2)
  4006898:	10803fcc 	andi	r2,r2,255
  400689c:	e0fffb17 	ldw	r3,-20(fp)
  40068a0:	1885883a 	add	r2,r3,r2
  40068a4:	e0bffb15 	stw	r2,-20(fp)
+						data_ptr = (USB_DESCR*) byte_ptr;
  40068a8:	e0bffb17 	ldw	r2,-20(fp)
  40068ac:	e0bffa15 	stw	r2,-24(fp)
  40068b0:	00004d06 	br	40069e8 <HIDMProbe+0x3b4>
+					} else {
+						/* fill endpoint information structure */
+						devtable[addr].epinfo[1].epAddr =
  40068b4:	e0fffe03 	ldbu	r3,-8(fp)
  40068b8:	008100b4 	movhi	r2,1026
  40068bc:	10b5cd04 	addi	r2,r2,-10444
@@ -9801,9 +9876,18 @@ void spu_set_map(int *map)
  40068c4:	10c5883a 	add	r2,r2,r3
  40068c8:	10800017 	ldw	r2,0(r2)
  40068cc:	10800204 	addi	r2,r2,8
+								data_ptr->descr.endpoint.bEndpointAddress;
  40068d0:	e0fffa17 	ldw	r3,-24(fp)
  40068d4:	18c00083 	ldbu	r3,2(r3)
+							!= USB_DESCRIPTOR_ENDPOINT) { //skip to endpoint descriptor
+						byte_ptr = byte_ptr + data_ptr->descr.config.bLength;
+						data_ptr = (USB_DESCR*) byte_ptr;
+					} else {
+						/* fill endpoint information structure */
+						devtable[addr].epinfo[1].epAddr =
  40068d8:	10c00005 	stb	r3,0(r2)
+								data_ptr->descr.endpoint.bEndpointAddress;
+						devtable[addr].epinfo[1].Attr =
  40068dc:	e0fffe03 	ldbu	r3,-8(fp)
  40068e0:	008100b4 	movhi	r2,1026
  40068e4:	10b5cd04 	addi	r2,r2,-10444
@@ -9811,9 +9895,18 @@ void spu_set_map(int *map)
  40068ec:	10c5883a 	add	r2,r2,r3
  40068f0:	10800017 	ldw	r2,0(r2)
  40068f4:	10800204 	addi	r2,r2,8
+								data_ptr->descr.endpoint.bmAttributes;
  40068f8:	e0fffa17 	ldw	r3,-24(fp)
  40068fc:	18c000c3 	ldbu	r3,3(r3)
+						data_ptr = (USB_DESCR*) byte_ptr;
+					} else {
+						/* fill endpoint information structure */
+						devtable[addr].epinfo[1].epAddr =
+								data_ptr->descr.endpoint.bEndpointAddress;
+						devtable[addr].epinfo[1].Attr =
  4006900:	10c00045 	stb	r3,1(r2)
+								data_ptr->descr.endpoint.bmAttributes;
+						devtable[addr].epinfo[1].MaxPktSize =
  4006904:	e0fffe03 	ldbu	r3,-8(fp)
  4006908:	008100b4 	movhi	r2,1026
  400690c:	10b5cd04 	addi	r2,r2,-10444
@@ -9821,9 +9914,18 @@ void spu_set_map(int *map)
  4006914:	10c5883a 	add	r2,r2,r3
  4006918:	10800017 	ldw	r2,0(r2)
  400691c:	10800204 	addi	r2,r2,8
+								data_ptr->descr.endpoint.wMaxPacketSize;
  4006920:	e0fffa17 	ldw	r3,-24(fp)
  4006924:	18c0010b 	ldhu	r3,4(r3)
+						/* fill endpoint information structure */
+						devtable[addr].epinfo[1].epAddr =
+								data_ptr->descr.endpoint.bEndpointAddress;
+						devtable[addr].epinfo[1].Attr =
+								data_ptr->descr.endpoint.bmAttributes;
+						devtable[addr].epinfo[1].MaxPktSize =
  4006928:	10c0008d 	sth	r3,2(r2)
+								data_ptr->descr.endpoint.wMaxPacketSize;
+						devtable[addr].epinfo[1].Interval =
  400692c:	e0fffe03 	ldbu	r3,-8(fp)
  4006930:	008100b4 	movhi	r2,1026
  4006934:	10b5cd04 	addi	r2,r2,-10444
@@ -9831,9 +9933,20 @@ void spu_set_map(int *map)
  400693c:	10c5883a 	add	r2,r2,r3
  4006940:	10800017 	ldw	r2,0(r2)
  4006944:	10800204 	addi	r2,r2,8
+								data_ptr->descr.endpoint.bInterval;
  4006948:	e0fffa17 	ldw	r3,-24(fp)
  400694c:	18c00183 	ldbu	r3,6(r3)
+								data_ptr->descr.endpoint.bEndpointAddress;
+						devtable[addr].epinfo[1].Attr =
+								data_ptr->descr.endpoint.bmAttributes;
+						devtable[addr].epinfo[1].MaxPktSize =
+								data_ptr->descr.endpoint.wMaxPacketSize;
+						devtable[addr].epinfo[1].Interval =
  4006950:	10c00105 	stb	r3,4(r2)
+								data_ptr->descr.endpoint.bInterval;
+						// devtable[ addr ].epinfo[ 1 ].rcvToggle = bmRCVTOG0;
+						/* configure device */
+						rcode = XferSetConf(addr, 0, confvalue); //set configuration
  4006954:	e0fffe03 	ldbu	r3,-8(fp)
  4006958:	e0bffc43 	ldbu	r2,-15(fp)
  400695c:	d8000415 	stw	zero,16(sp)
@@ -9847,10 +9960,14 @@ void spu_set_map(int *map)
  400697c:	1809883a 	mov	r4,r3
  4006980:	40077bc0 	call	40077bc <XferCtrlReq>
  4006984:	e0bffc05 	stb	r2,-16(fp)
+						if (rcode) {   //error handling
  4006988:	e0bffc03 	ldbu	r2,-16(fp)
  400698c:	10000226 	beq	r2,zero,4006998 <HIDMProbe+0x364>
+							return (FALSE);
  4006990:	0005883a 	mov	r2,zero
  4006994:	00002406 	br	4006a28 <HIDMProbe+0x3f4>
+						}
+						rcode = XferSetProto(addr, 0, hid_device.interface,
  4006998:	e0fffe03 	ldbu	r3,-8(fp)
  400699c:	d0a6f943 	ldbu	r2,-25627(gp)
  40069a0:	10803fcc 	andi	r2,r2,255
@@ -9865,28 +9982,64 @@ void spu_set_map(int *map)
  40069c4:	1809883a 	mov	r4,r3
  40069c8:	40077bc0 	call	40077bc <XferCtrlReq>
  40069cc:	e0bffc05 	stb	r2,-16(fp)
+								BOOT_PROTOCOL);
+						if (rcode) {   //error handling
  40069d0:	e0bffc03 	ldbu	r2,-16(fp)
  40069d4:	10000226 	beq	r2,zero,40069e0 <HIDMProbe+0x3ac>
+							return (FALSE);
  40069d8:	0005883a 	mov	r2,zero
  40069dc:	00001206 	br	4006a28 <HIDMProbe+0x3f4>
+						} else {
+							return (TRUE);
  40069e0:	00800044 	movi	r2,1
  40069e4:	00001006 	br	4006a28 <HIDMProbe+0x3f4>
+				hid_device.interface =
+						data_ptr->descr.interface.bInterfaceNumber;
+				hid_device.addr = addr;
+				byte_ptr = byte_ptr + data_ptr->descr.config.bLength;
+				data_ptr = (USB_DESCR*) byte_ptr;
+				while (byte_ptr < bigbuf + total_length) {
  40069e8:	e0fff90b 	ldhu	r3,-28(fp)
  40069ec:	008100b4 	movhi	r2,1026
  40069f0:	10b58d04 	addi	r2,r2,-10700
  40069f4:	1885883a 	add	r2,r3,r2
  40069f8:	e0fffb17 	ldw	r3,-20(fp)
  40069fc:	18bf9f36 	bltu	r3,r2,400687c <__alt_data_end+0xfc00687c>
+			BYTE subclass = data_ptr->descr.interface.bInterfaceSubClass;
+			BYTE protocol = data_ptr->descr.interface.bInterfaceProtocol;
+			//printf("class %x, subclass %x, protocol %x,\n", class, subclass,
+			//		protocol);
+			//interface descriptor
+			if (class == HID_INTF && subclass == BOOT_INTF_SUBCLASS
  4006a00:	00000206 	br	4006a0c <HIDMProbe+0x3d8>
+						}
+					}
+				}   //while( byte_ptr....
+			}   //if (Class matches
+			else { //if class don't match; die on first interface. Not really correct
+				return (FALSE);
  4006a04:	0005883a 	mov	r2,zero
  4006a08:	00000706 	br	4006a28 <HIDMProbe+0x3f4>
+	//printf("checking configuration value (length: %d): ",
+	//		data_ptr->descr.config.wTotalLength);
+	//for (int i = 0; i < data_ptr->descr.config.wTotalLength; i++) {
+		//printf("%x ", (unsigned char) (bigbuf[i] & 0xff));
+	//}
+	while (byte_ptr < bigbuf + total_length) {
  4006a0c:	e0fff90b 	ldhu	r3,-28(fp)
  4006a10:	008100b4 	movhi	r2,1026
  4006a14:	10b58d04 	addi	r2,r2,-10700
  4006a18:	1885883a 	add	r2,r3,r2
  4006a1c:	e0fffb17 	ldw	r3,-20(fp)
  4006a20:	18bf4736 	bltu	r3,r2,4006740 <__alt_data_end+0xfc006740>
+			else { //if class don't match; die on first interface. Not really correct
+				return (FALSE);
+			}
+		} //else if( data_ptr->
+	} // while( byte_ptr < &buf + total_length
+	return (FALSE);
  4006a24:	0005883a 	mov	r2,zero
+}
  4006a28:	e037883a 	mov	sp,fp
  4006a2c:	dfc00117 	ldw	ra,4(sp)
  4006a30:	df000017 	ldw	fp,0(sp)
@@ -9894,6 +10047,12 @@ void spu_set_map(int *map)
  4006a38:	f800283a 	ret
 
 04006a3c <HIDKProbe>:
+/* HID Keyboard probe. Called from USB state machine.                           */
+/* assumes configuration length is less than 256 bytes                          */
+/* looks for Class:03, Subclass: 01, Protocol: 01 in interface descriptor       */
+/* sets keyboard in boot protocol                                               */
+/* assumes single configuration, single endpoint, and interface configuration 0 */
+BOOL HIDKProbe(BYTE addr, DWORD flags) {
  4006a3c:	defff204 	addi	sp,sp,-56
  4006a40:	dfc00d15 	stw	ra,52(sp)
  4006a44:	df000c15 	stw	fp,48(sp)
@@ -9901,12 +10060,19 @@ void spu_set_map(int *map)
  4006a4c:	2005883a 	mov	r2,r4
  4006a50:	e17fff15 	stw	r5,-4(fp)
  4006a54:	e0bffe05 	stb	r2,-8(fp)
+	BYTE tmpbyte;
+	BYTE rcode;
+	BYTE confvalue;
+	WORD total_length;
+	USB_DESCR* data_ptr = (USB_DESCR *) &bigbuf;
  4006a58:	008100b4 	movhi	r2,1026
  4006a5c:	10b58d04 	addi	r2,r2,-10700
  4006a60:	e0bffa15 	stw	r2,-24(fp)
+	BYTE* byte_ptr = bigbuf;
  4006a64:	008100b4 	movhi	r2,1026
  4006a68:	10b58d04 	addi	r2,r2,-10700
  4006a6c:	e0bffb15 	stw	r2,-20(fp)
+	rcode = XferGetConfDescr(addr, 0, CONF_DESCR_LEN, 0, bigbuf); //get configuration descriptor
  4006a70:	e0fffe03 	ldbu	r3,-8(fp)
  4006a74:	008100b4 	movhi	r2,1026
  4006a78:	10b58d04 	addi	r2,r2,-10700
@@ -9923,21 +10089,30 @@ void spu_set_map(int *map)
  4006aa4:	1809883a 	mov	r4,r3
  4006aa8:	40077bc0 	call	40077bc <XferCtrlReq>
  4006aac:	e0bffc05 	stb	r2,-16(fp)
+	if (rcode) {   //error handling           
  4006ab0:	e0bffc03 	ldbu	r2,-16(fp)
  4006ab4:	10000226 	beq	r2,zero,4006ac0 <HIDKProbe+0x84>
+		return (FALSE);
  4006ab8:	0005883a 	mov	r2,zero
  4006abc:	0000dc06 	br	4006e30 <HIDKProbe+0x3f4>
+	}
+	if (data_ptr->descr.config.wTotalLength > 256) {
  4006ac0:	e0bffa17 	ldw	r2,-24(fp)
  4006ac4:	1080008b 	ldhu	r2,2(r2)
  4006ac8:	10bfffcc 	andi	r2,r2,65535
  4006acc:	10804070 	cmpltui	r2,r2,257
  4006ad0:	1000031e 	bne	r2,zero,4006ae0 <HIDKProbe+0xa4>
+		total_length = 256;
  4006ad4:	00804004 	movi	r2,256
  4006ad8:	e0bff90d 	sth	r2,-28(fp)
  4006adc:	00000306 	br	4006aec <HIDKProbe+0xb0>
+	} else {
+		total_length = data_ptr->descr.config.wTotalLength;
  4006ae0:	e0bffa17 	ldw	r2,-24(fp)
  4006ae4:	1080008b 	ldhu	r2,2(r2)
  4006ae8:	e0bff90d 	sth	r2,-28(fp)
+	}
+	rcode = XferGetConfDescr(addr, 0, total_length, 0, bigbuf); //get the whole configuration
  4006aec:	e13ffe03 	ldbu	r4,-8(fp)
  4006af0:	e0fff90b 	ldhu	r3,-28(fp)
  4006af4:	008100b4 	movhi	r2,1026
@@ -9953,46 +10128,68 @@ void spu_set_map(int *map)
  4006b1c:	000b883a 	mov	r5,zero
  4006b20:	40077bc0 	call	40077bc <XferCtrlReq>
  4006b24:	e0bffc05 	stb	r2,-16(fp)
+	if (rcode) {   //error handling
  4006b28:	e0bffc03 	ldbu	r2,-16(fp)
  4006b2c:	10000226 	beq	r2,zero,4006b38 <HIDKProbe+0xfc>
+		return (FALSE);
  4006b30:	0005883a 	mov	r2,zero
  4006b34:	0000be06 	br	4006e30 <HIDKProbe+0x3f4>
+	}
+	confvalue = data_ptr->descr.config.bConfigurationValue; //save configuration value to use later
  4006b38:	e0bffa17 	ldw	r2,-24(fp)
  4006b3c:	10800143 	ldbu	r2,5(r2)
  4006b40:	e0bffc45 	stb	r2,-15(fp)
+	while (byte_ptr < bigbuf + total_length) {             //parse configuration
  4006b44:	0000b306 	br	4006e14 <HIDKProbe+0x3d8>
+		if (data_ptr->descr.config.bDescriptorType != USB_DESCRIPTOR_INTERFACE) { //skip to the next descriptor
  4006b48:	e0bffa17 	ldw	r2,-24(fp)
  4006b4c:	10800043 	ldbu	r2,1(r2)
  4006b50:	10803fcc 	andi	r2,r2,255
  4006b54:	10800120 	cmpeqi	r2,r2,4
  4006b58:	1000091e 	bne	r2,zero,4006b80 <HIDKProbe+0x144>
+			byte_ptr = byte_ptr + data_ptr->descr.config.bLength;
  4006b5c:	e0bffa17 	ldw	r2,-24(fp)
  4006b60:	10800003 	ldbu	r2,0(r2)
  4006b64:	10803fcc 	andi	r2,r2,255
  4006b68:	e0fffb17 	ldw	r3,-20(fp)
  4006b6c:	1885883a 	add	r2,r3,r2
  4006b70:	e0bffb15 	stw	r2,-20(fp)
+			data_ptr = (USB_DESCR*) byte_ptr;
  4006b74:	e0bffb17 	ldw	r2,-20(fp)
  4006b78:	e0bffa15 	stw	r2,-24(fp)
  4006b7c:	0000a506 	br	4006e14 <HIDKProbe+0x3d8>
+		} // if( data_ptr->descr.config.bDescriptorType != USB_DESCRIPTOR_INTERFACE
+		else {
+			//printf("starting interface parsing at byte location %d\n",
+			//		data_ptr->descr.config.bLength);
+			BYTE class = data_ptr->descr.interface.bInterfaceClass;
  4006b80:	e0bffa17 	ldw	r2,-24(fp)
  4006b84:	10800143 	ldbu	r2,5(r2)
  4006b88:	e0bffc85 	stb	r2,-14(fp)
+			BYTE subclass = data_ptr->descr.interface.bInterfaceSubClass;
  4006b8c:	e0bffa17 	ldw	r2,-24(fp)
  4006b90:	10800183 	ldbu	r2,6(r2)
  4006b94:	e0bffcc5 	stb	r2,-13(fp)
+			BYTE protocol = data_ptr->descr.interface.bInterfaceProtocol;
  4006b98:	e0bffa17 	ldw	r2,-24(fp)
  4006b9c:	108001c3 	ldbu	r2,7(r2)
  4006ba0:	e0bffd05 	stb	r2,-12(fp)
+			//printf("class %x, subclass %x, protocol %x,\n", class, subclass,
+			//		protocol);
+			//interface descriptor
+			if (class == HID_INTF && subclass == BOOT_INTF_SUBCLASS
  4006ba4:	e0bffc83 	ldbu	r2,-14(fp)
  4006ba8:	108000d8 	cmpnei	r2,r2,3
  4006bac:	1000971e 	bne	r2,zero,4006e0c <HIDKProbe+0x3d0>
  4006bb0:	e0bffcc3 	ldbu	r2,-13(fp)
  4006bb4:	10800058 	cmpnei	r2,r2,1
  4006bb8:	1000941e 	bne	r2,zero,4006e0c <HIDKProbe+0x3d0>
+					&& protocol == HID_PROTOCOL_KEYBOARD) {
  4006bbc:	e0bffd03 	ldbu	r2,-12(fp)
  4006bc0:	10800058 	cmpnei	r2,r2,1
  4006bc4:	1000911e 	bne	r2,zero,4006e0c <HIDKProbe+0x3d0>
+				//detected a keyboard
+				devtable[addr].devclass = HID_K;             //fill device class
  4006bc8:	e0fffe03 	ldbu	r3,-8(fp)
  4006bcc:	008100b4 	movhi	r2,1026
  4006bd0:	10b5cd04 	addi	r2,r2,-10444
@@ -10001,6 +10198,7 @@ void spu_set_map(int *map)
  4006bdc:	10800104 	addi	r2,r2,4
  4006be0:	00c00044 	movi	r3,1
  4006be4:	10c00005 	stb	r3,0(r2)
+				tmpbyte = devtable[addr].epinfo->MaxPktSize; //save max.packet size
  4006be8:	e0fffe03 	ldbu	r3,-8(fp)
  4006bec:	008100b4 	movhi	r2,1026
  4006bf0:	10b5cd04 	addi	r2,r2,-10444
@@ -10009,7 +10207,9 @@ void spu_set_map(int *map)
  4006bfc:	10800017 	ldw	r2,0(r2)
  4006c00:	1080008b 	ldhu	r2,2(r2)
  4006c04:	e0bffd45 	stb	r2,-11(fp)
+				HID_init();                         //initialize data structures
  4006c08:	4006e440 	call	4006e44 <HID_init>
+				devtable[addr].epinfo = hid_ep; //switch endpoint information structure
  4006c0c:	e0fffe03 	ldbu	r3,-8(fp)
  4006c10:	008100b4 	movhi	r2,1026
  4006c14:	10b5cd04 	addi	r2,r2,-10444
@@ -10018,6 +10218,7 @@ void spu_set_map(int *map)
  4006c20:	008100b4 	movhi	r2,1026
  4006c24:	10b0c904 	addi	r2,r2,-15580
  4006c28:	18800015 	stw	r2,0(r3)
+				devtable[addr].epinfo[0].MaxPktSize = tmpbyte; //fill in max.packet size
  4006c2c:	e0fffe03 	ldbu	r3,-8(fp)
  4006c30:	008100b4 	movhi	r2,1026
  4006c34:	10b5cd04 	addi	r2,r2,-10444
@@ -10026,34 +10227,54 @@ void spu_set_map(int *map)
  4006c40:	10800017 	ldw	r2,0(r2)
  4006c44:	e0fffd43 	ldbu	r3,-11(fp)
  4006c48:	10c0008d 	sth	r3,2(r2)
+				hid_device.interface =
+						data_ptr->descr.interface.bInterfaceNumber; //fill in interface number to be used in HID requests
  4006c4c:	e0bffa17 	ldw	r2,-24(fp)
  4006c50:	10800083 	ldbu	r2,2(r2)
+				devtable[addr].devclass = HID_K;             //fill device class
+				tmpbyte = devtable[addr].epinfo->MaxPktSize; //save max.packet size
+				HID_init();                         //initialize data structures
+				devtable[addr].epinfo = hid_ep; //switch endpoint information structure
+				devtable[addr].epinfo[0].MaxPktSize = tmpbyte; //fill in max.packet size
+				hid_device.interface =
  4006c54:	d0a6f945 	stb	r2,-25627(gp)
+						data_ptr->descr.interface.bInterfaceNumber; //fill in interface number to be used in HID requests
+				hid_device.addr = addr;                        //fill in address
  4006c58:	e0bffe03 	ldbu	r2,-8(fp)
  4006c5c:	d0a6f905 	stb	r2,-25628(gp)
+				byte_ptr = byte_ptr + data_ptr->descr.config.bLength; //skip to the next descriptor
  4006c60:	e0bffa17 	ldw	r2,-24(fp)
  4006c64:	10800003 	ldbu	r2,0(r2)
  4006c68:	10803fcc 	andi	r2,r2,255
  4006c6c:	e0fffb17 	ldw	r3,-20(fp)
  4006c70:	1885883a 	add	r2,r3,r2
  4006c74:	e0bffb15 	stw	r2,-20(fp)
+				data_ptr = (USB_DESCR*) byte_ptr;
  4006c78:	e0bffb17 	ldw	r2,-20(fp)
  4006c7c:	e0bffa15 	stw	r2,-24(fp)
+				while (byte_ptr < bigbuf + total_length) {
  4006c80:	00005b06 	br	4006df0 <HIDKProbe+0x3b4>
+					if (data_ptr->descr.config.bDescriptorType
  4006c84:	e0bffa17 	ldw	r2,-24(fp)
  4006c88:	10800043 	ldbu	r2,1(r2)
  4006c8c:	10803fcc 	andi	r2,r2,255
  4006c90:	10800160 	cmpeqi	r2,r2,5
  4006c94:	1000091e 	bne	r2,zero,4006cbc <HIDKProbe+0x280>
+							!= USB_DESCRIPTOR_ENDPOINT) { //skip to endpoint descriptor
+						byte_ptr = byte_ptr + data_ptr->descr.config.bLength;
  4006c98:	e0bffa17 	ldw	r2,-24(fp)
  4006c9c:	10800003 	ldbu	r2,0(r2)
  4006ca0:	10803fcc 	andi	r2,r2,255
  4006ca4:	e0fffb17 	ldw	r3,-20(fp)
  4006ca8:	1885883a 	add	r2,r3,r2
  4006cac:	e0bffb15 	stw	r2,-20(fp)
+						data_ptr = (USB_DESCR*) byte_ptr;
  4006cb0:	e0bffb17 	ldw	r2,-20(fp)
  4006cb4:	e0bffa15 	stw	r2,-24(fp)
  4006cb8:	00004d06 	br	4006df0 <HIDKProbe+0x3b4>
+					} else {
+						/* fill endpoint information structure */
+						devtable[addr].epinfo[1].epAddr =
  4006cbc:	e0fffe03 	ldbu	r3,-8(fp)
  4006cc0:	008100b4 	movhi	r2,1026
  4006cc4:	10b5cd04 	addi	r2,r2,-10444
@@ -10061,9 +10282,18 @@ void spu_set_map(int *map)
  4006ccc:	10c5883a 	add	r2,r2,r3
  4006cd0:	10800017 	ldw	r2,0(r2)
  4006cd4:	10800204 	addi	r2,r2,8
+								data_ptr->descr.endpoint.bEndpointAddress;
  4006cd8:	e0fffa17 	ldw	r3,-24(fp)
  4006cdc:	18c00083 	ldbu	r3,2(r3)
+							!= USB_DESCRIPTOR_ENDPOINT) { //skip to endpoint descriptor
+						byte_ptr = byte_ptr + data_ptr->descr.config.bLength;
+						data_ptr = (USB_DESCR*) byte_ptr;
+					} else {
+						/* fill endpoint information structure */
+						devtable[addr].epinfo[1].epAddr =
  4006ce0:	10c00005 	stb	r3,0(r2)
+								data_ptr->descr.endpoint.bEndpointAddress;
+						devtable[addr].epinfo[1].Attr =
  4006ce4:	e0fffe03 	ldbu	r3,-8(fp)
  4006ce8:	008100b4 	movhi	r2,1026
  4006cec:	10b5cd04 	addi	r2,r2,-10444
@@ -10071,9 +10301,18 @@ void spu_set_map(int *map)
  4006cf4:	10c5883a 	add	r2,r2,r3
  4006cf8:	10800017 	ldw	r2,0(r2)
  4006cfc:	10800204 	addi	r2,r2,8
+								data_ptr->descr.endpoint.bmAttributes;
  4006d00:	e0fffa17 	ldw	r3,-24(fp)
  4006d04:	18c000c3 	ldbu	r3,3(r3)
+						data_ptr = (USB_DESCR*) byte_ptr;
+					} else {
+						/* fill endpoint information structure */
+						devtable[addr].epinfo[1].epAddr =
+								data_ptr->descr.endpoint.bEndpointAddress;
+						devtable[addr].epinfo[1].Attr =
  4006d08:	10c00045 	stb	r3,1(r2)
+								data_ptr->descr.endpoint.bmAttributes;
+						devtable[addr].epinfo[1].MaxPktSize =
  4006d0c:	e0fffe03 	ldbu	r3,-8(fp)
  4006d10:	008100b4 	movhi	r2,1026
  4006d14:	10b5cd04 	addi	r2,r2,-10444
@@ -10081,9 +10320,18 @@ void spu_set_map(int *map)
  4006d1c:	10c5883a 	add	r2,r2,r3
  4006d20:	10800017 	ldw	r2,0(r2)
  4006d24:	10800204 	addi	r2,r2,8
+								data_ptr->descr.endpoint.wMaxPacketSize;
  4006d28:	e0fffa17 	ldw	r3,-24(fp)
  4006d2c:	18c0010b 	ldhu	r3,4(r3)
+						/* fill endpoint information structure */
+						devtable[addr].epinfo[1].epAddr =
+								data_ptr->descr.endpoint.bEndpointAddress;
+						devtable[addr].epinfo[1].Attr =
+								data_ptr->descr.endpoint.bmAttributes;
+						devtable[addr].epinfo[1].MaxPktSize =
  4006d30:	10c0008d 	sth	r3,2(r2)
+								data_ptr->descr.endpoint.wMaxPacketSize;
+						devtable[addr].epinfo[1].Interval =
  4006d34:	e0fffe03 	ldbu	r3,-8(fp)
  4006d38:	008100b4 	movhi	r2,1026
  4006d3c:	10b5cd04 	addi	r2,r2,-10444
@@ -10091,9 +10339,19 @@ void spu_set_map(int *map)
  4006d44:	10c5883a 	add	r2,r2,r3
  4006d48:	10800017 	ldw	r2,0(r2)
  4006d4c:	10800204 	addi	r2,r2,8
+								data_ptr->descr.endpoint.bInterval;
  4006d50:	e0fffa17 	ldw	r3,-24(fp)
  4006d54:	18c00183 	ldbu	r3,6(r3)
+								data_ptr->descr.endpoint.bEndpointAddress;
+						devtable[addr].epinfo[1].Attr =
+								data_ptr->descr.endpoint.bmAttributes;
+						devtable[addr].epinfo[1].MaxPktSize =
+								data_ptr->descr.endpoint.wMaxPacketSize;
+						devtable[addr].epinfo[1].Interval =
  4006d58:	10c00105 	stb	r3,4(r2)
+								data_ptr->descr.endpoint.bInterval;
+						/* configure device */
+						rcode = XferSetConf(addr, 0, confvalue); //set configuration
  4006d5c:	e0fffe03 	ldbu	r3,-8(fp)
  4006d60:	e0bffc43 	ldbu	r2,-15(fp)
  4006d64:	d8000415 	stw	zero,16(sp)
@@ -10107,10 +10365,14 @@ void spu_set_map(int *map)
  4006d84:	1809883a 	mov	r4,r3
  4006d88:	40077bc0 	call	40077bc <XferCtrlReq>
  4006d8c:	e0bffc05 	stb	r2,-16(fp)
+						if (rcode) {   //error handling
  4006d90:	e0bffc03 	ldbu	r2,-16(fp)
  4006d94:	10000226 	beq	r2,zero,4006da0 <HIDKProbe+0x364>
+							return (FALSE);
  4006d98:	0005883a 	mov	r2,zero
  4006d9c:	00002406 	br	4006e30 <HIDKProbe+0x3f4>
+						}
+						rcode = XferSetProto(addr, 0, hid_device.interface,
  4006da0:	e0fffe03 	ldbu	r3,-8(fp)
  4006da4:	d0a6f943 	ldbu	r2,-25627(gp)
  4006da8:	10803fcc 	andi	r2,r2,255
@@ -10125,28 +10387,64 @@ void spu_set_map(int *map)
  4006dcc:	1809883a 	mov	r4,r3
  4006dd0:	40077bc0 	call	40077bc <XferCtrlReq>
  4006dd4:	e0bffc05 	stb	r2,-16(fp)
+								BOOT_PROTOCOL);
+						if (rcode) {   //error handling
  4006dd8:	e0bffc03 	ldbu	r2,-16(fp)
  4006ddc:	10000226 	beq	r2,zero,4006de8 <HIDKProbe+0x3ac>
+							return (FALSE);
  4006de0:	0005883a 	mov	r2,zero
  4006de4:	00001206 	br	4006e30 <HIDKProbe+0x3f4>
+						} else {
+							return (TRUE);
  4006de8:	00800044 	movi	r2,1
  4006dec:	00001006 	br	4006e30 <HIDKProbe+0x3f4>
+				hid_device.interface =
+						data_ptr->descr.interface.bInterfaceNumber; //fill in interface number to be used in HID requests
+				hid_device.addr = addr;                        //fill in address
+				byte_ptr = byte_ptr + data_ptr->descr.config.bLength; //skip to the next descriptor
+				data_ptr = (USB_DESCR*) byte_ptr;
+				while (byte_ptr < bigbuf + total_length) {
  4006df0:	e0fff90b 	ldhu	r3,-28(fp)
  4006df4:	008100b4 	movhi	r2,1026
  4006df8:	10b58d04 	addi	r2,r2,-10700
  4006dfc:	1885883a 	add	r2,r3,r2
  4006e00:	e0fffb17 	ldw	r3,-20(fp)
  4006e04:	18bf9f36 	bltu	r3,r2,4006c84 <__alt_data_end+0xfc006c84>
+			BYTE subclass = data_ptr->descr.interface.bInterfaceSubClass;
+			BYTE protocol = data_ptr->descr.interface.bInterfaceProtocol;
+			//printf("class %x, subclass %x, protocol %x,\n", class, subclass,
+			//		protocol);
+			//interface descriptor
+			if (class == HID_INTF && subclass == BOOT_INTF_SUBCLASS
  4006e08:	00000206 	br	4006e14 <HIDKProbe+0x3d8>
+						}
+					}
+				}   //while( byte_ptr....
+			}   //if (Class matches
+			else { //if class don't match; stop processing after first interface. Not really correct
+				return (FALSE);
  4006e0c:	0005883a 	mov	r2,zero
  4006e10:	00000706 	br	4006e30 <HIDKProbe+0x3f4>
+	rcode = XferGetConfDescr(addr, 0, total_length, 0, bigbuf); //get the whole configuration
+	if (rcode) {   //error handling
+		return (FALSE);
+	}
+	confvalue = data_ptr->descr.config.bConfigurationValue; //save configuration value to use later
+	while (byte_ptr < bigbuf + total_length) {             //parse configuration
  4006e14:	e0fff90b 	ldhu	r3,-28(fp)
  4006e18:	008100b4 	movhi	r2,1026
  4006e1c:	10b58d04 	addi	r2,r2,-10700
  4006e20:	1885883a 	add	r2,r3,r2
  4006e24:	e0fffb17 	ldw	r3,-20(fp)
  4006e28:	18bf4736 	bltu	r3,r2,4006b48 <__alt_data_end+0xfc006b48>
+			else { //if class don't match; stop processing after first interface. Not really correct
+				return (FALSE);
+			}
+		} //else if( data_ptr->
+	} // while( byte_ptr < &buf + total_length
+	return (FALSE);
  4006e2c:	0005883a 	mov	r2,zero
+}
  4006e30:	e037883a 	mov	sp,fp
  4006e34:	dfc00117 	ldw	ra,4(sp)
  4006e38:	df000017 	ldw	fp,0(sp)
@@ -10154,17 +10452,22 @@ void spu_set_map(int *map)
  4006e40:	f800283a 	ret
 
 04006e44 <HID_init>:
+/* HID data structures initialization */
+void HID_init(void) {
  4006e44:	deffff04 	addi	sp,sp,-4
  4006e48:	df000015 	stw	fp,0(sp)
  4006e4c:	d839883a 	mov	fp,sp
+	hid_ep[1].sndToggle = bmSNDTOG0;
  4006e50:	008100b4 	movhi	r2,1026
  4006e54:	10b0c904 	addi	r2,r2,-15580
  4006e58:	00c01004 	movi	r3,64
  4006e5c:	10c00345 	stb	r3,13(r2)
+	hid_ep[1].rcvToggle = bmRCVTOG0;
  4006e60:	008100b4 	movhi	r2,1026
  4006e64:	10b0c904 	addi	r2,r2,-15580
  4006e68:	00c00404 	movi	r3,16
  4006e6c:	10c00385 	stb	r3,14(r2)
+}
  4006e70:	0001883a 	nop
  4006e74:	e037883a 	mov	sp,fp
  4006e78:	df000017 	ldw	fp,0(sp)
@@ -10172,18 +10475,24 @@ void spu_set_map(int *map)
  4006e80:	f800283a 	ret
 
 04006e84 <mousePoll>:
+/* poll boot mouse */
+BYTE mousePoll(BOOT_MOUSE_REPORT* buf) {
  4006e84:	defffb04 	addi	sp,sp,-20
  4006e88:	dfc00415 	stw	ra,16(sp)
  4006e8c:	df000315 	stw	fp,12(sp)
  4006e90:	df000304 	addi	fp,sp,12
  4006e94:	e13fff15 	stw	r4,-4(fp)
+	BYTE rcode;
+	MAXreg_wr( rPERADDR, hid_device.addr);    //set peripheral address
  4006e98:	d0a6f903 	ldbu	r2,-25628(gp)
  4006e9c:	10803fcc 	andi	r2,r2,255
  4006ea0:	100b883a 	mov	r5,r2
  4006ea4:	01003804 	movi	r4,224
  4006ea8:	40070600 	call	4007060 <MAXreg_wr>
+	rcode = XferInTransfer(hid_device.addr, 1, 8, (BYTE*) buf,
  4006eac:	d0a6f903 	ldbu	r2,-25628(gp)
  4006eb0:	11003fcc 	andi	r4,r2,255
+			devtable[hid_device.addr].epinfo[1].MaxPktSize);
  4006eb4:	d0a6f903 	ldbu	r2,-25628(gp)
  4006eb8:	10c03fcc 	andi	r3,r2,255
  4006ebc:	008100b4 	movhi	r2,1026
@@ -10193,6 +10502,12 @@ void spu_set_map(int *map)
  4006ecc:	10800017 	ldw	r2,0(r2)
  4006ed0:	10800204 	addi	r2,r2,8
  4006ed4:	1080008b 	ldhu	r2,2(r2)
+}
+/* poll boot mouse */
+BYTE mousePoll(BOOT_MOUSE_REPORT* buf) {
+	BYTE rcode;
+	MAXreg_wr( rPERADDR, hid_device.addr);    //set peripheral address
+	rcode = XferInTransfer(hid_device.addr, 1, 8, (BYTE*) buf,
  4006ed8:	10803fcc 	andi	r2,r2,255
  4006edc:	d8800015 	stw	r2,0(sp)
  4006ee0:	e1ffff17 	ldw	r7,-4(fp)
@@ -10200,7 +10515,10 @@ void spu_set_map(int *map)
  4006ee8:	01400044 	movi	r5,1
  4006eec:	4007be00 	call	4007be0 <XferInTransfer>
  4006ef0:	e0bffe05 	stb	r2,-8(fp)
+			devtable[hid_device.addr].epinfo[1].MaxPktSize);
+	return (rcode);
  4006ef4:	e0bffe03 	ldbu	r2,-8(fp)
+}
  4006ef8:	e037883a 	mov	sp,fp
  4006efc:	dfc00117 	ldw	ra,4(sp)
  4006f00:	df000017 	ldw	fp,0(sp)
@@ -10208,18 +10526,24 @@ void spu_set_map(int *map)
  4006f08:	f800283a 	ret
 
 04006f0c <kbdPoll>:
+/* poll boot keyboard */
+BYTE kbdPoll(BOOT_KBD_REPORT* buf) {
  4006f0c:	defffb04 	addi	sp,sp,-20
  4006f10:	dfc00415 	stw	ra,16(sp)
  4006f14:	df000315 	stw	fp,12(sp)
  4006f18:	df000304 	addi	fp,sp,12
  4006f1c:	e13fff15 	stw	r4,-4(fp)
+	BYTE rcode;
+	MAXreg_wr( rPERADDR, hid_device.addr);    //set peripheral address
  4006f20:	d0a6f903 	ldbu	r2,-25628(gp)
  4006f24:	10803fcc 	andi	r2,r2,255
  4006f28:	100b883a 	mov	r5,r2
  4006f2c:	01003804 	movi	r4,224
  4006f30:	40070600 	call	4007060 <MAXreg_wr>
+	rcode = XferInTransfer(hid_device.addr, 1, 8, (BYTE*) buf,
  4006f34:	d0a6f903 	ldbu	r2,-25628(gp)
  4006f38:	11003fcc 	andi	r4,r2,255
+			devtable[hid_device.addr].epinfo[1].MaxPktSize);
  4006f3c:	d0a6f903 	ldbu	r2,-25628(gp)
  4006f40:	10c03fcc 	andi	r3,r2,255
  4006f44:	008100b4 	movhi	r2,1026
@@ -10229,6 +10553,12 @@ void spu_set_map(int *map)
  4006f54:	10800017 	ldw	r2,0(r2)
  4006f58:	10800204 	addi	r2,r2,8
  4006f5c:	1080008b 	ldhu	r2,2(r2)
+}
+/* poll boot keyboard */
+BYTE kbdPoll(BOOT_KBD_REPORT* buf) {
+	BYTE rcode;
+	MAXreg_wr( rPERADDR, hid_device.addr);    //set peripheral address
+	rcode = XferInTransfer(hid_device.addr, 1, 8, (BYTE*) buf,
  4006f60:	10803fcc 	andi	r2,r2,255
  4006f64:	d8800015 	stw	r2,0(sp)
  4006f68:	e1ffff17 	ldw	r7,-4(fp)
@@ -10236,7 +10566,10 @@ void spu_set_map(int *map)
  4006f70:	01400044 	movi	r5,1
  4006f74:	4007be00 	call	4007be0 <XferInTransfer>
  4006f78:	e0bffe05 	stb	r2,-8(fp)
+			devtable[hid_device.addr].epinfo[1].MaxPktSize);
+	return (rcode);
  4006f7c:	e0bffe03 	ldbu	r2,-8(fp)
+}
  4006f80:	e037883a 	mov	sp,fp
  4006f84:	dfc00117 	ldw	ra,4(sp)
  4006f88:	df000017 	ldw	fp,0(sp)
@@ -10244,6 +10577,7 @@ void spu_set_map(int *map)
  4006f90:	f800283a 	ret
 
 04006f94 <HIDMEventHandler>:
+BOOL HIDMEventHandler(BYTE address, BYTE event, void *data, DWORD size) {
  4006f94:	defffb04 	addi	sp,sp,-20
  4006f98:	df000415 	stw	fp,16(sp)
  4006f9c:	df000404 	addi	fp,sp,16
@@ -10253,13 +10587,16 @@ void spu_set_map(int *map)
  4006fac:	e1ffff15 	stw	r7,-4(fp)
  4006fb0:	e0fffc05 	stb	r3,-16(fp)
  4006fb4:	e0bffd05 	stb	r2,-12(fp)
+	return (FALSE);
  4006fb8:	0005883a 	mov	r2,zero
+}
  4006fbc:	e037883a 	mov	sp,fp
  4006fc0:	df000017 	ldw	fp,0(sp)
  4006fc4:	dec00104 	addi	sp,sp,4
  4006fc8:	f800283a 	ret
 
 04006fcc <HIDKEventHandler>:
+BOOL HIDKEventHandler(BYTE address, BYTE event, void *data, DWORD size) {
  4006fcc:	defffb04 	addi	sp,sp,-20
  4006fd0:	df000415 	stw	fp,16(sp)
  4006fd4:	df000404 	addi	fp,sp,16
@@ -10269,7 +10606,9 @@ void spu_set_map(int *map)
  4006fe4:	e1ffff15 	stw	r7,-4(fp)
  4006fe8:	e0fffc05 	stb	r3,-16(fp)
  4006fec:	e0bffd05 	stb	r2,-12(fp)
+	return (FALSE);
  4006ff0:	0005883a 	mov	r2,zero
+}
  4006ff4:	e037883a 	mov	sp,fp
  4006ff8:	df000017 	ldw	fp,0(sp)
  4006ffc:	dec00104 	addi	sp,sp,4
@@ -26593,6 +26932,12 @@ int ALT_FSTAT (int file, struct stat *st)
  4015b80:	f800283a 	ret
 
 04015b84 <gettimeofday>:
+ */
+ 
+
+#if defined (__GNUC__) && (__GNUC__ >= 4)
+int ALT_GETTIMEOFDAY (struct timeval  *ptimeval, void *ptimezone_vptr)
+{
  4015b84:	defff404 	addi	sp,sp,-48
  4015b88:	dfc00b15 	stw	ra,44(sp)
  4015b8c:	df000a15 	stw	fp,40(sp)
@@ -26604,14 +26949,42 @@ int ALT_FSTAT (int file, struct stat *st)
  4015ba4:	df000a04 	addi	fp,sp,40
  4015ba8:	e13ff915 	stw	r4,-28(fp)
  4015bac:	e17ffa15 	stw	r5,-24(fp)
+  struct timezone *ptimezone = (struct timezone*)ptimezone_vptr;
  4015bb0:	e0bffa17 	ldw	r2,-24(fp)
  4015bb4:	e0bff615 	stw	r2,-40(fp)
+ * alt_nticks() returns the elapsed number of system clock ticks since reset.
+ */
+
+static ALT_INLINE alt_u32 ALT_ALWAYS_INLINE alt_nticks (void)
+{
+  return _alt_nticks;
  4015bb8:	d0a70e17 	ldw	r2,-25544(gp)
+#else
+int ALT_GETTIMEOFDAY (struct timeval  *ptimeval, struct timezone *ptimezone)
+{
+#endif
+  
+  alt_u32 nticks = alt_nticks (); 
  4015bbc:	e0bff715 	stw	r2,-36(fp)
+ * Obtain the system clock rate in ticks/s. 
+ */
+
+static ALT_INLINE alt_u32 ALT_ALWAYS_INLINE alt_ticks_per_second (void)
+{
+  return _alt_tick_rate;
  4015bc0:	d0a70d17 	ldw	r2,-25548(gp)
+  alt_u32 tick_rate = alt_ticks_per_second ();
  4015bc4:	e0bff815 	stw	r2,-32(fp)
+   * non-zero system clock rate. If the system clock is not running, an error
+   * is generated and the contents of "ptimeval" and "ptimezone" are not
+   * updated.
+   */
+
+  if (tick_rate)
  4015bc8:	e0bff817 	ldw	r2,-32(fp)
  4015bcc:	10005f26 	beq	r2,zero,4015d4c <gettimeofday+0x1c8>
+  {
+    ptimeval->tv_sec  = alt_resettime.tv_sec  + nticks/tick_rate;
  4015bd0:	d0a70817 	ldw	r2,-25568(gp)
  4015bd4:	1029883a 	mov	r20,r2
  4015bd8:	e17ff817 	ldw	r5,-32(fp)
@@ -26621,8 +26994,10 @@ int ALT_FSTAT (int file, struct stat *st)
  4015be8:	1007883a 	mov	r3,r2
  4015bec:	e0bff917 	ldw	r2,-28(fp)
  4015bf0:	10c00015 	stw	r3,0(r2)
+    ptimeval->tv_usec = alt_resettime.tv_usec +
  4015bf4:	d0a70917 	ldw	r2,-25564(gp)
  4015bf8:	1029883a 	mov	r20,r2
+     (alt_u32)(((alt_u64)nticks*(ALT_US/tick_rate))%ALT_US);
  4015bfc:	e0bff717 	ldw	r2,-36(fp)
  4015c00:	1021883a 	mov	r16,r2
  4015c04:	0023883a 	mov	r17,zero
@@ -26651,24 +27026,43 @@ int ALT_FSTAT (int file, struct stat *st)
  4015c60:	180b883a 	mov	r5,r3
  4015c64:	2005883a 	mov	r2,r4
  4015c68:	2807883a 	mov	r3,r5
+   */
+
+  if (tick_rate)
+  {
+    ptimeval->tv_sec  = alt_resettime.tv_sec  + nticks/tick_rate;
+    ptimeval->tv_usec = alt_resettime.tv_usec +
  4015c6c:	a085883a 	add	r2,r20,r2
  4015c70:	1007883a 	mov	r3,r2
  4015c74:	e0bff917 	ldw	r2,-28(fp)
  4015c78:	10c00115 	stw	r3,4(r2)
+     (alt_u32)(((alt_u64)nticks*(ALT_US/tick_rate))%ALT_US);
+      
+    while(ptimeval->tv_usec < 0) {
  4015c7c:	00001406 	br	4015cd0 <gettimeofday+0x14c>
+      if (ptimeval->tv_sec <= 0)
  4015c80:	e0bff917 	ldw	r2,-28(fp)
  4015c84:	10800017 	ldw	r2,0(r2)
  4015c88:	00800516 	blt	zero,r2,4015ca0 <gettimeofday+0x11c>
+      {
+          ptimeval->tv_sec = 0;
  4015c8c:	e0bff917 	ldw	r2,-28(fp)
  4015c90:	10000015 	stw	zero,0(r2)
+          ptimeval->tv_usec = 0;
  4015c94:	e0bff917 	ldw	r2,-28(fp)
  4015c98:	10000115 	stw	zero,4(r2)
+          break;
  4015c9c:	00000f06 	br	4015cdc <gettimeofday+0x158>
+      }
+      else
+      {
+          ptimeval->tv_sec--;
  4015ca0:	e0bff917 	ldw	r2,-28(fp)
  4015ca4:	10800017 	ldw	r2,0(r2)
  4015ca8:	10ffffc4 	addi	r3,r2,-1
  4015cac:	e0bff917 	ldw	r2,-28(fp)
  4015cb0:	10c00015 	stw	r3,0(r2)
+          ptimeval->tv_usec += ALT_US;
  4015cb4:	e0bff917 	ldw	r2,-28(fp)
  4015cb8:	10c00117 	ldw	r3,4(r2)
  4015cbc:	008003f4 	movhi	r2,15
@@ -26676,15 +27070,29 @@ int ALT_FSTAT (int file, struct stat *st)
  4015cc4:	1887883a 	add	r3,r3,r2
  4015cc8:	e0bff917 	ldw	r2,-28(fp)
  4015ccc:	10c00115 	stw	r3,4(r2)
+  {
+    ptimeval->tv_sec  = alt_resettime.tv_sec  + nticks/tick_rate;
+    ptimeval->tv_usec = alt_resettime.tv_usec +
+     (alt_u32)(((alt_u64)nticks*(ALT_US/tick_rate))%ALT_US);
+      
+    while(ptimeval->tv_usec < 0) {
  4015cd0:	e0bff917 	ldw	r2,-28(fp)
  4015cd4:	10800117 	ldw	r2,4(r2)
  4015cd8:	103fe916 	blt	r2,zero,4015c80 <__alt_data_end+0xfc015c80>
+          ptimeval->tv_sec--;
+          ptimeval->tv_usec += ALT_US;
+      }
+    }
+    
+    while(ptimeval->tv_usec >= ALT_US) {
  4015cdc:	00000c06 	br	4015d10 <gettimeofday+0x18c>
+      ptimeval->tv_sec++;
  4015ce0:	e0bff917 	ldw	r2,-28(fp)
  4015ce4:	10800017 	ldw	r2,0(r2)
  4015ce8:	10c00044 	addi	r3,r2,1
  4015cec:	e0bff917 	ldw	r2,-28(fp)
  4015cf0:	10c00015 	stw	r3,0(r2)
+      ptimeval->tv_usec -= ALT_US;
  4015cf4:	e0bff917 	ldw	r2,-28(fp)
  4015cf8:	10c00117 	ldw	r3,4(r2)
  4015cfc:	00bffc74 	movhi	r2,65521
@@ -26692,22 +27100,43 @@ int ALT_FSTAT (int file, struct stat *st)
  4015d04:	1887883a 	add	r3,r3,r2
  4015d08:	e0bff917 	ldw	r2,-28(fp)
  4015d0c:	10c00115 	stw	r3,4(r2)
+          ptimeval->tv_sec--;
+          ptimeval->tv_usec += ALT_US;
+      }
+    }
+    
+    while(ptimeval->tv_usec >= ALT_US) {
  4015d10:	e0bff917 	ldw	r2,-28(fp)
  4015d14:	10c00117 	ldw	r3,4(r2)
  4015d18:	008003f4 	movhi	r2,15
  4015d1c:	10908fc4 	addi	r2,r2,16959
  4015d20:	10ffef16 	blt	r2,r3,4015ce0 <__alt_data_end+0xfc015ce0>
+      ptimeval->tv_sec++;
+      ptimeval->tv_usec -= ALT_US;
+    }
+      
+    if (ptimezone)
  4015d24:	e0bff617 	ldw	r2,-40(fp)
  4015d28:	10000626 	beq	r2,zero,4015d44 <gettimeofday+0x1c0>
+    { 
+      ptimezone->tz_minuteswest = alt_timezone.tz_minuteswest;
  4015d2c:	d0e70617 	ldw	r3,-25576(gp)
  4015d30:	e0bff617 	ldw	r2,-40(fp)
  4015d34:	10c00015 	stw	r3,0(r2)
+      ptimezone->tz_dsttime     = alt_timezone.tz_dsttime;
  4015d38:	d0e70717 	ldw	r3,-25572(gp)
  4015d3c:	e0bff617 	ldw	r2,-40(fp)
  4015d40:	10c00115 	stw	r3,4(r2)
+    }
+
+    return 0;
  4015d44:	0005883a 	mov	r2,zero
  4015d48:	00000106 	br	4015d50 <gettimeofday+0x1cc>
+  }
+
+  return -ENOTSUP;
  4015d4c:	00bfde84 	movi	r2,-134
+}
  4015d50:	e6fffb04 	addi	sp,fp,-20
  4015d54:	dfc00617 	ldw	ra,24(sp)
  4015d58:	df000517 	ldw	fp,20(sp)
@@ -26827,16 +27256,27 @@ int ALT_ISATTY (int file)
  4015e5c:	f800283a 	ret
 
 04015e60 <alt_load_section>:
+ */
+
+static void ALT_INLINE alt_load_section (alt_u32* from, 
+                                         alt_u32* to, 
+                                         alt_u32* end)
+{
  4015e60:	defffc04 	addi	sp,sp,-16
  4015e64:	df000315 	stw	fp,12(sp)
  4015e68:	df000304 	addi	fp,sp,12
  4015e6c:	e13ffd15 	stw	r4,-12(fp)
  4015e70:	e17ffe15 	stw	r5,-8(fp)
  4015e74:	e1bfff15 	stw	r6,-4(fp)
+  if (to != from)
  4015e78:	e0fffe17 	ldw	r3,-8(fp)
  4015e7c:	e0bffd17 	ldw	r2,-12(fp)
  4015e80:	18800c26 	beq	r3,r2,4015eb4 <alt_load_section+0x54>
+  {
+    while( to != end )
  4015e84:	00000806 	br	4015ea8 <alt_load_section+0x48>
+    {
+      *to++ = *from++;
  4015e88:	e0bffe17 	ldw	r2,-8(fp)
  4015e8c:	10c00104 	addi	r3,r2,4
  4015e90:	e0fffe15 	stw	r3,-8(fp)
@@ -26845,9 +27285,20 @@ int ALT_ISATTY (int file)
  4015e9c:	e13ffd15 	stw	r4,-12(fp)
  4015ea0:	18c00017 	ldw	r3,0(r3)
  4015ea4:	10c00015 	stw	r3,0(r2)
+                                         alt_u32* to, 
+                                         alt_u32* end)
+{
+  if (to != from)
+  {
+    while( to != end )
  4015ea8:	e0fffe17 	ldw	r3,-8(fp)
  4015eac:	e0bfff17 	ldw	r2,-4(fp)
  4015eb0:	18bff51e 	bne	r3,r2,4015e88 <__alt_data_end+0xfc015e88>
+    {
+      *to++ = *from++;
+    }
+  }
+}
  4015eb4:	0001883a 	nop
  4015eb8:	e037883a 	mov	sp,fp
  4015ebc:	df000017 	ldw	fp,0(sp)
@@ -26855,10 +27306,21 @@ int ALT_ISATTY (int file)
  4015ec4:	f800283a 	ret
 
 04015ec8 <alt_load>:
+ * there is no bootloader, so this application is responsible for loading to
+ * RAM any sections that are required.
+ */  
+
+void alt_load (void)
+{
  4015ec8:	defffe04 	addi	sp,sp,-8
  4015ecc:	dfc00115 	stw	ra,4(sp)
  4015ed0:	df000015 	stw	fp,0(sp)
  4015ed4:	d839883a 	mov	fp,sp
+  /* 
+   * Copy the .rwdata section. 
+   */
+
+  alt_load_section (&__flash_rwdata_start, 
  4015ed8:	018100b4 	movhi	r6,1026
  4015edc:	31a9d004 	addi	r6,r6,-22720
  4015ee0:	014100b4 	movhi	r5,1026
@@ -26866,6 +27328,12 @@ int ALT_ISATTY (int file)
  4015ee8:	010100b4 	movhi	r4,1026
  4015eec:	2129d004 	addi	r4,r4,-22720
  4015ef0:	4015e600 	call	4015e60 <alt_load_section>
+
+  /*
+   * Copy the exception handler.
+   */
+
+  alt_load_section (&__flash_exceptions_start, 
  4015ef4:	01810034 	movhi	r6,1024
  4015ef8:	31808c04 	addi	r6,r6,560
  4015efc:	01410034 	movhi	r5,1024
@@ -26873,6 +27341,12 @@ int ALT_ISATTY (int file)
  4015f04:	01010034 	movhi	r4,1024
  4015f08:	21000804 	addi	r4,r4,32
  4015f0c:	4015e600 	call	4015e60 <alt_load_section>
+
+  /*
+   * Copy the .rodata section.
+   */
+
+  alt_load_section (&__flash_rodata_start, 
  4015f10:	018100b4 	movhi	r6,1026
  4015f14:	31a2f504 	addi	r6,r6,-29740
  4015f18:	014100b4 	movhi	r5,1026
@@ -26880,8 +27354,16 @@ int ALT_ISATTY (int file)
  4015f20:	010100b4 	movhi	r4,1026
  4015f24:	21219c04 	addi	r4,r4,-31120
  4015f28:	4015e600 	call	4015e60 <alt_load_section>
+  
+  /*
+   * Now ensure that the caches are in synch.
+   */
+  
+  alt_dcache_flush_all();
  4015f2c:	401775c0 	call	401775c <alt_dcache_flush_all>
+  alt_icache_flush_all();
  4015f30:	401791c0 	call	401791c <alt_icache_flush_all>
+}
  4015f34:	0001883a 	nop
  4015f38:	e037883a 	mov	sp,fp
  4015f3c:	dfc00117 	ldw	ra,4(sp)
@@ -27098,10 +27580,17 @@ void alt_main (void)
  40160dc:	40182f00 	call	40182f0 <exit>
 
 040160e0 <__malloc_lock>:
+ * configuration is single threaded, so there is nothing to do here. Note that 
+ * this requires that malloc is never called by an interrupt service routine.
+ */
+
+void __malloc_lock ( struct _reent *_r )
+{
  40160e0:	defffe04 	addi	sp,sp,-8
  40160e4:	df000115 	stw	fp,4(sp)
  40160e8:	df000104 	addi	fp,sp,4
  40160ec:	e13fff15 	stw	r4,-4(fp)
+}
  40160f0:	0001883a 	nop
  40160f4:	e037883a 	mov	sp,fp
  40160f8:	df000017 	ldw	fp,0(sp)
@@ -27109,10 +27598,17 @@ void alt_main (void)
  4016100:	f800283a 	ret
 
 04016104 <__malloc_unlock>:
+/*
+ *
+ */
+
+void __malloc_unlock ( struct _reent *_r )
+{
  4016104:	defffe04 	addi	sp,sp,-8
  4016108:	df000115 	stw	fp,4(sp)
  401610c:	df000104 	addi	fp,sp,4
  4016110:	e13fff15 	stw	r4,-4(fp)
+}
  4016114:	0001883a 	nop
  4016118:	e037883a 	mov	sp,fp
  401611c:	df000017 	ldw	fp,0(sp)
@@ -27621,13 +28117,21 @@ void alt_tick (void)
  401653c:	f800283a 	ret
 
 04016540 <usleep>:
+#if defined (__GNUC__) && __GNUC__ >= 4
+int ALT_USLEEP (useconds_t us)
+#else
+unsigned int ALT_USLEEP (unsigned int us)
+#endif
+{
  4016540:	defffd04 	addi	sp,sp,-12
  4016544:	dfc00215 	stw	ra,8(sp)
  4016548:	df000115 	stw	fp,4(sp)
  401654c:	df000104 	addi	fp,sp,4
  4016550:	e13fff15 	stw	r4,-4(fp)
+  return alt_busy_sleep(us);
  4016554:	e13fff17 	ldw	r4,-4(fp)
  4016558:	40176040 	call	4017604 <alt_busy_sleep>
+}
  401655c:	e037883a 	mov	sp,fp
  4016560:	dfc00117 	ldw	ra,4(sp)
  4016564:	df000017 	ldw	fp,0(sp)
@@ -28055,12 +28559,6 @@ void altera_avalon_jtag_uart_init(altera_avalon_jtag_uart_state* sp,
   if (alt_alarm_start(&sp->alarm, alt_ticks_per_second(), 
  4016954:	e0bffd17 	ldw	r2,-12(fp)
  4016958:	10800204 	addi	r2,r2,8
- * Obtain the system clock rate in ticks/s. 
- */
-
-static ALT_INLINE alt_u32 ALT_ALWAYS_INLINE alt_ticks_per_second (void)
-{
-  return _alt_tick_rate;
  401695c:	d0e70d17 	ldw	r3,-25548(gp)
  4016960:	e1fffd17 	ldw	r7,-12(fp)
  4016964:	01810074 	movhi	r6,1025
@@ -29115,6 +29613,12 @@ static ALT_INLINE alt_irq_context ALT_ALWAYS_INLINE
  40171e4:	f800283a 	ret
 
 040171e8 <alt_avalon_spi_command>:
+
+int alt_avalon_spi_command(alt_u32 base, alt_u32 slave,
+                           alt_u32 write_length, const alt_u8 * write_data,
+                           alt_u32 read_length, alt_u8 * read_data,
+                           alt_u32 flags)
+{
  40171e8:	defff404 	addi	sp,sp,-48
  40171ec:	df000b15 	stw	fp,44(sp)
  40171f0:	df000b04 	addi	fp,sp,44
@@ -29122,20 +29626,37 @@ static ALT_INLINE alt_irq_context ALT_ALWAYS_INLINE
  40171f8:	e17ffd15 	stw	r5,-12(fp)
  40171fc:	e1bffe15 	stw	r6,-8(fp)
  4017200:	e1ffff15 	stw	r7,-4(fp)
+  const alt_u8 * write_end = write_data + write_length;
  4017204:	e0ffff17 	ldw	r3,-4(fp)
  4017208:	e0bffe17 	ldw	r2,-8(fp)
  401720c:	1885883a 	add	r2,r3,r2
  4017210:	e0bff815 	stw	r2,-32(fp)
+  alt_u8 * read_end = read_data + read_length;
  4017214:	e0c00217 	ldw	r3,8(fp)
  4017218:	e0800117 	ldw	r2,4(fp)
  401721c:	1885883a 	add	r2,r3,r2
  4017220:	e0bff915 	stw	r2,-28(fp)
+
+  alt_u32 write_zeros = read_length;
  4017224:	e0800117 	ldw	r2,4(fp)
  4017228:	e0bff515 	stw	r2,-44(fp)
+  alt_u32 read_ignore = write_length;
  401722c:	e0bffe17 	ldw	r2,-8(fp)
  4017230:	e0bff615 	stw	r2,-40(fp)
+
+  /* We must not send more than two bytes to the target before it has
+   * returned any as otherwise it will overflow. */
+  /* Unfortunately the hardware does not seem to work with credits > 1,
+   * leave it at 1 for now. */
+  alt_32 credits = 1;
  4017234:	00800044 	movi	r2,1
  4017238:	e0bff715 	stw	r2,-36(fp)
+  /* Warning: this function is not currently safe if called in a multi-threaded
+   * environment, something above must perform locking to make it safe if more
+   * than one thread intends to use it.
+   */
+
+  IOWR_ALTERA_AVALON_SPI_SLAVE_SEL(base, 1 << slave);
  401723c:	e0bffc17 	ldw	r2,-16(fp)
  4017240:	10800504 	addi	r2,r2,20
  4017244:	1009883a 	mov	r4,r2
@@ -29143,39 +29664,79 @@ static ALT_INLINE alt_irq_context ALT_ALWAYS_INLINE
  401724c:	e0bffd17 	ldw	r2,-12(fp)
  4017250:	1884983a 	sll	r2,r3,r2
  4017254:	20800035 	stwio	r2,0(r4)
+  
+  /* Set the SSO bit (force chipselect) only if the toggle flag is not set */
+  if ((flags & ALT_AVALON_SPI_COMMAND_TOGGLE_SS_N) == 0) {
  4017258:	e0800317 	ldw	r2,12(fp)
  401725c:	1080008c 	andi	r2,r2,2
  4017260:	1000051e 	bne	r2,zero,4017278 <alt_avalon_spi_command+0x90>
+    IOWR_ALTERA_AVALON_SPI_CONTROL(base, ALTERA_AVALON_SPI_CONTROL_SSO_MSK);
  4017264:	e0bffc17 	ldw	r2,-16(fp)
  4017268:	10800304 	addi	r2,r2,12
  401726c:	1007883a 	mov	r3,r2
  4017270:	00810004 	movi	r2,1024
  4017274:	18800035 	stwio	r2,0(r3)
+  /*
+   * Discard any stale data present in the RXDATA register, in case
+   * previous communication was interrupted and stale data was left
+   * behind.
+   */
+  IORD_ALTERA_AVALON_SPI_RXDATA(base);
  4017278:	e0bffc17 	ldw	r2,-16(fp)
  401727c:	10800037 	ldwio	r2,0(r2)
+  for ( ; ; )
+  {
+    
+    do
+    {
+      status = IORD_ALTERA_AVALON_SPI_STATUS(base);
  4017280:	e0bffc17 	ldw	r2,-16(fp)
  4017284:	10800204 	addi	r2,r2,8
  4017288:	10800037 	ldwio	r2,0(r2)
  401728c:	e0bffa15 	stw	r2,-24(fp)
+    }
+    while (((status & ALTERA_AVALON_SPI_STATUS_TRDY_MSK) == 0 || credits == 0) &&
  4017290:	e0bffa17 	ldw	r2,-24(fp)
  4017294:	1080100c 	andi	r2,r2,64
+            (status & ALTERA_AVALON_SPI_STATUS_RRDY_MSK) == 0);
  4017298:	10000226 	beq	r2,zero,40172a4 <alt_avalon_spi_command+0xbc>
+    
+    do
+    {
+      status = IORD_ALTERA_AVALON_SPI_STATUS(base);
+    }
+    while (((status & ALTERA_AVALON_SPI_STATUS_TRDY_MSK) == 0 || credits == 0) &&
  401729c:	e0bff717 	ldw	r2,-36(fp)
  40172a0:	1000031e 	bne	r2,zero,40172b0 <alt_avalon_spi_command+0xc8>
+            (status & ALTERA_AVALON_SPI_STATUS_RRDY_MSK) == 0);
  40172a4:	e0bffa17 	ldw	r2,-24(fp)
  40172a8:	1080200c 	andi	r2,r2,128
+    
+    do
+    {
+      status = IORD_ALTERA_AVALON_SPI_STATUS(base);
+    }
+    while (((status & ALTERA_AVALON_SPI_STATUS_TRDY_MSK) == 0 || credits == 0) &&
  40172ac:	103ff426 	beq	r2,zero,4017280 <__alt_data_end+0xfc017280>
+            (status & ALTERA_AVALON_SPI_STATUS_RRDY_MSK) == 0);
+
+    if ((status & ALTERA_AVALON_SPI_STATUS_TRDY_MSK) != 0 && credits > 0)
  40172b0:	e0bffa17 	ldw	r2,-24(fp)
  40172b4:	1080100c 	andi	r2,r2,64
  40172b8:	10001e26 	beq	r2,zero,4017334 <alt_avalon_spi_command+0x14c>
  40172bc:	e0bff717 	ldw	r2,-36(fp)
  40172c0:	00801c0e 	bge	zero,r2,4017334 <alt_avalon_spi_command+0x14c>
+    {
+      credits--;
  40172c4:	e0bff717 	ldw	r2,-36(fp)
  40172c8:	10bfffc4 	addi	r2,r2,-1
  40172cc:	e0bff715 	stw	r2,-36(fp)
+
+      if (write_data < write_end)
  40172d0:	e0ffff17 	ldw	r3,-4(fp)
  40172d4:	e0bff817 	ldw	r2,-32(fp)
  40172d8:	18800a2e 	bgeu	r3,r2,4017304 <alt_avalon_spi_command+0x11c>
+        IOWR_ALTERA_AVALON_SPI_TXDATA(base, *write_data++);
  40172dc:	e0bffc17 	ldw	r2,-16(fp)
  40172e0:	10800104 	addi	r2,r2,4
  40172e4:	1009883a 	mov	r4,r2
@@ -29186,58 +29747,95 @@ static ALT_INLINE alt_irq_context ALT_ALWAYS_INLINE
  40172f8:	10803fcc 	andi	r2,r2,255
  40172fc:	20800035 	stwio	r2,0(r4)
  4017300:	00000c06 	br	4017334 <alt_avalon_spi_command+0x14c>
+      else if (write_zeros > 0)
  4017304:	e0bff517 	ldw	r2,-44(fp)
  4017308:	10000826 	beq	r2,zero,401732c <alt_avalon_spi_command+0x144>
+      {
+        write_zeros--;
  401730c:	e0bff517 	ldw	r2,-44(fp)
  4017310:	10bfffc4 	addi	r2,r2,-1
  4017314:	e0bff515 	stw	r2,-44(fp)
+        IOWR_ALTERA_AVALON_SPI_TXDATA(base, 0);
  4017318:	e0bffc17 	ldw	r2,-16(fp)
  401731c:	10800104 	addi	r2,r2,4
  4017320:	0007883a 	mov	r3,zero
  4017324:	10c00035 	stwio	r3,0(r2)
  4017328:	00000206 	br	4017334 <alt_avalon_spi_command+0x14c>
+      }
+      else
+        credits = -1024;
  401732c:	00bf0004 	movi	r2,-1024
  4017330:	e0bff715 	stw	r2,-36(fp)
+    };
+
+    if ((status & ALTERA_AVALON_SPI_STATUS_RRDY_MSK) != 0)
  4017334:	e0bffa17 	ldw	r2,-24(fp)
  4017338:	1080200c 	andi	r2,r2,128
  401733c:	103fd026 	beq	r2,zero,4017280 <__alt_data_end+0xfc017280>
+    {
+      alt_u32 rxdata = IORD_ALTERA_AVALON_SPI_RXDATA(base);
  4017340:	e0bffc17 	ldw	r2,-16(fp)
  4017344:	10800037 	ldwio	r2,0(r2)
  4017348:	e0bffb15 	stw	r2,-20(fp)
+
+      if (read_ignore > 0)
  401734c:	e0bff617 	ldw	r2,-40(fp)
  4017350:	10000426 	beq	r2,zero,4017364 <alt_avalon_spi_command+0x17c>
+        read_ignore--;
  4017354:	e0bff617 	ldw	r2,-40(fp)
  4017358:	10bfffc4 	addi	r2,r2,-1
  401735c:	e0bff615 	stw	r2,-40(fp)
  4017360:	00000506 	br	4017378 <alt_avalon_spi_command+0x190>
+      else
+        *read_data++ = (alt_u8)rxdata;
  4017364:	e0800217 	ldw	r2,8(fp)
  4017368:	10c00044 	addi	r3,r2,1
  401736c:	e0c00215 	stw	r3,8(fp)
  4017370:	e0fffb17 	ldw	r3,-20(fp)
  4017374:	10c00005 	stb	r3,0(r2)
+      credits++;
  4017378:	e0bff717 	ldw	r2,-36(fp)
  401737c:	10800044 	addi	r2,r2,1
  4017380:	e0bff715 	stw	r2,-36(fp)
+
+      if (read_ignore == 0 && read_data == read_end)
  4017384:	e0bff617 	ldw	r2,-40(fp)
  4017388:	103fbd1e 	bne	r2,zero,4017280 <__alt_data_end+0xfc017280>
  401738c:	e0c00217 	ldw	r3,8(fp)
  4017390:	e0bff917 	ldw	r2,-28(fp)
  4017394:	18bfba1e 	bne	r3,r2,4017280 <__alt_data_end+0xfc017280>
+  }
+
+  /* Wait until the interface has finished transmitting */
+  do
+  {
+    status = IORD_ALTERA_AVALON_SPI_STATUS(base);
  4017398:	e0bffc17 	ldw	r2,-16(fp)
  401739c:	10800204 	addi	r2,r2,8
  40173a0:	10800037 	ldwio	r2,0(r2)
  40173a4:	e0bffa15 	stw	r2,-24(fp)
+  }
+  while ((status & ALTERA_AVALON_SPI_STATUS_TMT_MSK) == 0);
  40173a8:	e0bffa17 	ldw	r2,-24(fp)
  40173ac:	1080080c 	andi	r2,r2,32
  40173b0:	103ff926 	beq	r2,zero,4017398 <__alt_data_end+0xfc017398>
+
+  /* Clear SSO (release chipselect) unless the caller is going to
+   * keep using this chip
+   */
+  if ((flags & ALT_AVALON_SPI_COMMAND_MERGE) == 0)
  40173b4:	e0800317 	ldw	r2,12(fp)
  40173b8:	1080004c 	andi	r2,r2,1
  40173bc:	1000041e 	bne	r2,zero,40173d0 <alt_avalon_spi_command+0x1e8>
+    IOWR_ALTERA_AVALON_SPI_CONTROL(base, 0);
  40173c0:	e0bffc17 	ldw	r2,-16(fp)
  40173c4:	10800304 	addi	r2,r2,12
  40173c8:	0007883a 	mov	r3,zero
  40173cc:	10c00035 	stwio	r3,0(r2)
+
+  return read_length;
  40173d0:	e0800117 	ldw	r2,4(fp)
+}
  40173d4:	e037883a 	mov	sp,fp
  40173d8:	df000017 	ldw	fp,0(sp)
  40173dc:	dec00104 	addi	sp,sp,4
@@ -29740,16 +30338,24 @@ void alt_dcache_flush_all (void)
  4017778:	f800283a 	ret
 
 0401777c <alt_get_errno>:
+#undef errno
+
+extern int errno;
+
+static ALT_INLINE int* alt_get_errno(void)
+{
  401777c:	defffe04 	addi	sp,sp,-8
  4017780:	dfc00115 	stw	ra,4(sp)
  4017784:	df000015 	stw	fp,0(sp)
  4017788:	d839883a 	mov	fp,sp
+  return ((alt_errno) ? alt_errno() : &errno);
  401778c:	d0a01317 	ldw	r2,-32692(gp)
  4017790:	10000326 	beq	r2,zero,40177a0 <alt_get_errno+0x24>
  4017794:	d0a01317 	ldw	r2,-32692(gp)
  4017798:	103ee83a 	callr	r2
  401779c:	00000106 	br	40177a4 <alt_get_errno+0x28>
  40177a0:	d0a6ff04 	addi	r2,gp,-25604
+}
  40177a4:	e037883a 	mov	sp,fp
  40177a8:	dfc00117 	ldw	ra,4(sp)
  40177ac:	df000017 	ldw	fp,0(sp)
@@ -29757,42 +30363,75 @@ void alt_dcache_flush_all (void)
  40177b4:	f800283a 	ret
 
 040177b8 <alt_dev_llist_insert>:
+/*
+ *
+ */
+
+int alt_dev_llist_insert (alt_dev_llist* dev, alt_llist* list)
+{
  40177b8:	defffa04 	addi	sp,sp,-24
  40177bc:	dfc00515 	stw	ra,20(sp)
  40177c0:	df000415 	stw	fp,16(sp)
  40177c4:	df000404 	addi	fp,sp,16
  40177c8:	e13ffe15 	stw	r4,-8(fp)
  40177cc:	e17fff15 	stw	r5,-4(fp)
+  /*
+   * check that the device exists, and that it has a valid name.
+   */
+
+  if (!dev || !dev->name)
  40177d0:	e0bffe17 	ldw	r2,-8(fp)
  40177d4:	10000326 	beq	r2,zero,40177e4 <alt_dev_llist_insert+0x2c>
  40177d8:	e0bffe17 	ldw	r2,-8(fp)
  40177dc:	10800217 	ldw	r2,8(r2)
  40177e0:	1000061e 	bne	r2,zero,40177fc <alt_dev_llist_insert+0x44>
+  {
+    ALT_ERRNO = EINVAL;
  40177e4:	401777c0 	call	401777c <alt_get_errno>
  40177e8:	1007883a 	mov	r3,r2
  40177ec:	00800584 	movi	r2,22
  40177f0:	18800015 	stw	r2,0(r3)
+    return -EINVAL;
  40177f4:	00bffa84 	movi	r2,-22
  40177f8:	00001306 	br	4017848 <alt_dev_llist_insert+0x90>
+  
+  /*
+   * register the device.
+   */
+  
+  alt_llist_insert(list, &dev->llist);
  40177fc:	e0bffe17 	ldw	r2,-8(fp)
  4017800:	e0ffff17 	ldw	r3,-4(fp)
  4017804:	e0fffc15 	stw	r3,-16(fp)
  4017808:	e0bffd15 	stw	r2,-12(fp)
+ */
+
+static ALT_INLINE void ALT_ALWAYS_INLINE alt_llist_insert(alt_llist* list, 
+                alt_llist* entry)
+{
+  entry->previous = list;
  401780c:	e0bffd17 	ldw	r2,-12(fp)
  4017810:	e0fffc17 	ldw	r3,-16(fp)
  4017814:	10c00115 	stw	r3,4(r2)
+  entry->next     = list->next;
  4017818:	e0bffc17 	ldw	r2,-16(fp)
  401781c:	10c00017 	ldw	r3,0(r2)
  4017820:	e0bffd17 	ldw	r2,-12(fp)
  4017824:	10c00015 	stw	r3,0(r2)
+
+  list->next->previous = entry;
  4017828:	e0bffc17 	ldw	r2,-16(fp)
  401782c:	10800017 	ldw	r2,0(r2)
  4017830:	e0fffd17 	ldw	r3,-12(fp)
  4017834:	10c00115 	stw	r3,4(r2)
+  list->next           = entry;
  4017838:	e0bffc17 	ldw	r2,-16(fp)
  401783c:	e0fffd17 	ldw	r3,-12(fp)
  4017840:	10c00015 	stw	r3,0(r2)
+
+  return 0;  
  4017844:	0005883a 	mov	r2,zero
+}
  4017848:	e037883a 	mov	sp,fp
  401784c:	dfc00117 	ldw	ra,4(sp)
  4017850:	df000017 	ldw	fp,0(sp)
@@ -29800,17 +30439,33 @@ void alt_dcache_flush_all (void)
  4017858:	f800283a 	ret
 
 0401785c <_do_ctors>:
+/*
+ * Run the C++ static constructors.
+ */
+
+void _do_ctors(void)
+{
  401785c:	defffd04 	addi	sp,sp,-12
  4017860:	dfc00215 	stw	ra,8(sp)
  4017864:	df000115 	stw	fp,4(sp)
  4017868:	df000104 	addi	fp,sp,4
+  constructor* ctor;
+
+  for (ctor = &__CTOR_END__[-1]; ctor >= __CTOR_LIST__; ctor--)
  401786c:	008100b4 	movhi	r2,1026
  4017870:	10a19b04 	addi	r2,r2,-31124
  4017874:	e0bfff15 	stw	r2,-4(fp)
  4017878:	00000606 	br	4017894 <_do_ctors+0x38>
+        (*ctor) (); 
  401787c:	e0bfff17 	ldw	r2,-4(fp)
  4017880:	10800017 	ldw	r2,0(r2)
  4017884:	103ee83a 	callr	r2
+
+void _do_ctors(void)
+{
+  constructor* ctor;
+
+  for (ctor = &__CTOR_END__[-1]; ctor >= __CTOR_LIST__; ctor--)
  4017888:	e0bfff17 	ldw	r2,-4(fp)
  401788c:	10bfff04 	addi	r2,r2,-4
  4017890:	e0bfff15 	stw	r2,-4(fp)
@@ -29818,6 +30473,8 @@ void alt_dcache_flush_all (void)
  4017898:	008100b4 	movhi	r2,1026
  401789c:	10a19c04 	addi	r2,r2,-31120
  40178a0:	18bff62e 	bgeu	r3,r2,401787c <__alt_data_end+0xfc01787c>
+        (*ctor) (); 
+}
  40178a4:	0001883a 	nop
  40178a8:	e037883a 	mov	sp,fp
  40178ac:	dfc00117 	ldw	ra,4(sp)
@@ -29826,17 +30483,33 @@ void alt_dcache_flush_all (void)
  40178b8:	f800283a 	ret
 
 040178bc <_do_dtors>:
+/*
+ * Run the C++ static destructors.
+ */
+
+void _do_dtors(void)
+{
  40178bc:	defffd04 	addi	sp,sp,-12
  40178c0:	dfc00215 	stw	ra,8(sp)
  40178c4:	df000115 	stw	fp,4(sp)
  40178c8:	df000104 	addi	fp,sp,4
+  destructor* dtor;
+
+  for (dtor = &__DTOR_END__[-1]; dtor >= __DTOR_LIST__; dtor--)
  40178cc:	008100b4 	movhi	r2,1026
  40178d0:	10a19b04 	addi	r2,r2,-31124
  40178d4:	e0bfff15 	stw	r2,-4(fp)
  40178d8:	00000606 	br	40178f4 <_do_dtors+0x38>
+        (*dtor) (); 
  40178dc:	e0bfff17 	ldw	r2,-4(fp)
  40178e0:	10800017 	ldw	r2,0(r2)
  40178e4:	103ee83a 	callr	r2
+
+void _do_dtors(void)
+{
+  destructor* dtor;
+
+  for (dtor = &__DTOR_END__[-1]; dtor >= __DTOR_LIST__; dtor--)
  40178e8:	e0bfff17 	ldw	r2,-4(fp)
  40178ec:	10bfff04 	addi	r2,r2,-4
  40178f0:	e0bfff15 	stw	r2,-4(fp)
@@ -29844,6 +30517,8 @@ void alt_dcache_flush_all (void)
  40178f8:	008100b4 	movhi	r2,1026
  40178fc:	10a19c04 	addi	r2,r2,-31120
  4017900:	18bff62e 	bgeu	r3,r2,40178dc <__alt_data_end+0xfc0178dc>
+        (*dtor) (); 
+}
  4017904:	0001883a 	nop
  4017908:	e037883a 	mov	sp,fp
  401790c:	dfc00117 	ldw	ra,4(sp)
