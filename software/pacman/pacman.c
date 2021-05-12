@@ -1,8 +1,8 @@
 /*
  * pacman.c
  *
- *  Created on: 2021��4��30��
- *      Author: user
+ *  Created on: 2021/04/30
+ *      Author: Wenhao Tan & Jiacheng Huang
  */
 
 #include "pacman.h"
@@ -141,82 +141,82 @@ int animate_map(int *map)
 	}
 }
 
-int random_sprite()
-{
-	return get_sprite(
-			(rand() % SPRITE_TYPE_SIZE << SPRITE_TYPE_SHIFT)
-		| (rand() % SPRITE_PROPERTY_SIZE << SPRITE_PROPERTY_SHIFT)
-		| (rand() % SPRITE_DIRECTION_SIZE << SPRITE_DIRECTION_SHIFT));
-}
+// int random_sprite()
+// {
+// 	return get_sprite(
+// 			(rand() % SPRITE_TYPE_SIZE << SPRITE_TYPE_SHIFT)
+// 		| (rand() % SPRITE_PROPERTY_SIZE << SPRITE_PROPERTY_SHIFT)
+// 		| (rand() % SPRITE_DIRECTION_SIZE << SPRITE_DIRECTION_SHIFT));
+// }
 
-void connect_walls(int *walls, int src, int dst)
-{
-	for (int y = 0; y < PACMAN_MAP_HEIGHT; ++y) {
-		for (int x = 0; x < PACMAN_MAP_WIDTH; ++x) {
-			if (walls[y * PACMAN_MAP_WIDTH + x] == src) {
-				walls[y * PACMAN_MAP_WIDTH + x] = dst;
-			}
-		}
-	}
-}
+// void connect_walls(int *walls, int src, int dst)
+// {
+// 	for (int y = 0; y < PACMAN_MAP_HEIGHT; ++y) {
+// 		for (int x = 0; x < PACMAN_MAP_WIDTH; ++x) {
+// 			if (walls[y * PACMAN_MAP_WIDTH + x] == src) {
+// 				walls[y * PACMAN_MAP_WIDTH + x] = dst;
+// 			}
+// 		}
+// 	}
+// }
 
-void random_walls(int *map)
-{
-	int walls[1200] = {0};
-	int index = 1;
-	for (int i = 0; i < 1024; ++i) {
-		int connected[1200] = {0};
-		int x = rand() % (PACMAN_MAP_WIDTH - 2) + 2;
-		int y = rand() % (PACMAN_MAP_HEIGHT - 2) + 2;
-		if (walls[y * PACMAN_MAP_WIDTH + x] != 0) {
-			continue;
-		}
-		int is_closed = 0;
-		int count = 0;
-		int connected_indices[8] = {0};
-		for (int j = y - 1; j < y + 2; ++j) {
-			for (int i = x - 1; i < x + 2; ++i) {
-				if (walls[j * PACMAN_MAP_WIDTH + i] != 0) {
-					if (connected[walls[j * PACMAN_MAP_WIDTH + i]]) {
-						is_closed = 1;
-						break;
-					}
-					connected[walls[j * PACMAN_MAP_WIDTH + i]] = 1;
-					connected_indices[count++] = walls[j * PACMAN_MAP_WIDTH + i];
-				}
-			}
-			if (is_closed) {
-				break;
-			}
-		}
-		if (count == 0) {
-			walls[y * PACMAN_MAP_WIDTH + x] = index++;
-			continue;
-		}
-		if (is_closed) {
-			continue;
-		}
-		for (int i = 1; i < count; ++i) {
-			connect_walls(walls, connected_indices[i], connected_indices[0]);
-		}
-	}
+// void random_walls(int *map)
+// {
+// 	int walls[1200] = {0};
+// 	int index = 1;
+// 	for (int i = 0; i < 1024; ++i) {
+// 		int connected[1200] = {0};
+// 		int x = rand() % (PACMAN_MAP_WIDTH - 2) + 2;
+// 		int y = rand() % (PACMAN_MAP_HEIGHT - 2) + 2;
+// 		if (walls[y * PACMAN_MAP_WIDTH + x] != 0) {
+// 			continue;
+// 		}
+// 		int is_closed = 0;
+// 		int count = 0;
+// 		int connected_indices[8] = {0};
+// 		for (int j = y - 1; j < y + 2; ++j) {
+// 			for (int i = x - 1; i < x + 2; ++i) {
+// 				if (walls[j * PACMAN_MAP_WIDTH + i] != 0) {
+// 					if (connected[walls[j * PACMAN_MAP_WIDTH + i]]) {
+// 						is_closed = 1;
+// 						break;
+// 					}
+// 					connected[walls[j * PACMAN_MAP_WIDTH + i]] = 1;
+// 					connected_indices[count++] = walls[j * PACMAN_MAP_WIDTH + i];
+// 				}
+// 			}
+// 			if (is_closed) {
+// 				break;
+// 			}
+// 		}
+// 		if (count == 0) {
+// 			walls[y * PACMAN_MAP_WIDTH + x] = index++;
+// 			continue;
+// 		}
+// 		if (is_closed) {
+// 			continue;
+// 		}
+// 		for (int i = 1; i < count; ++i) {
+// 			connect_walls(walls, connected_indices[i], connected_indices[0]);
+// 		}
+// 	}
 
-	for (int y = 0; y < PACMAN_MAP_HEIGHT; ++y) {
-		for (int x = 0; x < PACMAN_MAP_WIDTH; ++x) {
-			if (walls[y * PACMAN_MAP_WIDTH + x])
-				map_set_sprite(map, x, y, get_sprite(WALL));
-		}
-	}
-}
+// 	for (int y = 0; y < PACMAN_MAP_HEIGHT; ++y) {
+// 		for (int x = 0; x < PACMAN_MAP_WIDTH; ++x) {
+// 			if (walls[y * PACMAN_MAP_WIDTH + x])
+// 				map_set_sprite(map, x, y, get_sprite(WALL));
+// 		}
+// 	}
+// }
 
-void random_map(int *map)
-{
-	for (int y = 0; y < PACMAN_MAP_HEIGHT; ++y) {
-		for (int x = 0; x < PACMAN_MAP_WIDTH; ++x) {
-			map[y * PACMAN_MAP_WIDTH + x] = get_sprite(random_sprite());
-		}
-	}
-}
+// void random_map(int *map)
+// {
+// 	for (int y = 0; y < PACMAN_MAP_HEIGHT; ++y) {
+// 		for (int x = 0; x < PACMAN_MAP_WIDTH; ++x) {
+// 			map[y * PACMAN_MAP_WIDTH + x] = get_sprite(random_sprite());
+// 		}
+// 	}
+// }
 
 void main_map(int *map)
 {
@@ -438,7 +438,8 @@ void game_over(int *map)
 	map[27 * PACMAN_MAP_WIDTH + 36] = get_sprite(PACMAN);
 }
 
-void you_win(int *map) {
+void you_win(int *map)
+{
 	for (int y = 0; y < PACMAN_MAP_HEIGHT; ++y) {
 		for (int x = 0; x < PACMAN_MAP_WIDTH; ++x) {
 			map[y * PACMAN_MAP_WIDTH + x] = get_sprite(BACKGROUND);
@@ -517,6 +518,145 @@ void you_win(int *map) {
 	map[24 * PACMAN_MAP_WIDTH + 33] = get_sprite(PACMAN);
 }
 
+void start_menu(int *map)
+{
+	for (int y = 0; y < PACMAN_MAP_HEIGHT; ++y) {
+		for (int x = 0; x < PACMAN_MAP_WIDTH; ++x) {
+			map[y * PACMAN_MAP_WIDTH + x] = get_sprite(BACKGROUND);
+		}
+	}
+	for (int i = 0; i < 5; ++i) {
+		map[19 * PACMAN_MAP_WIDTH + 18 + i] = ENTER + i;
+		map[27 * PACMAN_MAP_WIDTH + 18 + i] = SPACE + i;
+	}
+	// PACMAN
+	for (int y = 3; y <= 9; ++y) {
+		map[y * PACMAN_MAP_WIDTH + 3] = get_sprite(PACMAN);
+		map[y * PACMAN_MAP_WIDTH + 14] = get_sprite(PACMAN);
+		map[y * PACMAN_MAP_WIDTH + 19] = get_sprite(PACMAN);
+		map[y * PACMAN_MAP_WIDTH + 23] = get_sprite(PACMAN);
+		map[y * PACMAN_MAP_WIDTH + 31] = get_sprite(PACMAN);
+		map[y * PACMAN_MAP_WIDTH + 35] = get_sprite(PACMAN);
+	}
+	for (int x = 4; x <= 6; ++x) {
+		map[3 * PACMAN_MAP_WIDTH + x] = get_sprite(PACMAN);
+		map[6 * PACMAN_MAP_WIDTH + x] = get_sprite(PACMAN);
+	}
+	for (int y = 4; y <= 5; ++y)
+		map[y * PACMAN_MAP_WIDTH + 6] = get_sprite(PACMAN);
+	for (int x = 15; x <= 17; ++x) {
+		map[3 * PACMAN_MAP_WIDTH + x] = get_sprite(PACMAN);
+		map[9 * PACMAN_MAP_WIDTH + x] = get_sprite(PACMAN);
+	}
+	for (int y = 7; y <= 9; ++y) {
+		map[y * PACMAN_MAP_WIDTH + 8] = get_sprite(PACMAN);
+		map[y * PACMAN_MAP_WIDTH + 12] = get_sprite(PACMAN);
+		map[y * PACMAN_MAP_WIDTH + 25] = get_sprite(PACMAN);
+		map[y * PACMAN_MAP_WIDTH + 29] = get_sprite(PACMAN);
+	}
+	for (int y = 4; y <= 6; ++y) {
+		map[y * PACMAN_MAP_WIDTH + 9] = get_sprite(PACMAN);
+		map[y * PACMAN_MAP_WIDTH + 11] = get_sprite(PACMAN);
+		map[y * PACMAN_MAP_WIDTH + 26] = get_sprite(PACMAN);
+		map[y * PACMAN_MAP_WIDTH + 28] = get_sprite(PACMAN);
+	}
+	map[3 * PACMAN_MAP_WIDTH + 10] = get_sprite(PACMAN);
+	map[6 * PACMAN_MAP_WIDTH + 10] = get_sprite(PACMAN);
+	map[3 * PACMAN_MAP_WIDTH + 27] = get_sprite(PACMAN);
+	map[6 * PACMAN_MAP_WIDTH + 27] = get_sprite(PACMAN);
+	map[4 * PACMAN_MAP_WIDTH + 20] = get_sprite(PACMAN);
+	map[4 * PACMAN_MAP_WIDTH + 22] = get_sprite(PACMAN);
+	map[4 * PACMAN_MAP_WIDTH + 32] = get_sprite(PACMAN);
+	map[8 * PACMAN_MAP_WIDTH + 34] = get_sprite(PACMAN);
+	for (int y = 5; y <= 7; ++y) {
+		map[y * PACMAN_MAP_WIDTH + 21] = get_sprite(PACMAN);
+		map[y * PACMAN_MAP_WIDTH + 33] = get_sprite(PACMAN);
+	}
+	// 1 player
+	for (int y = 14; y <= 16; ++y)
+		map[y * PACMAN_MAP_WIDTH + 6] = get_sprite(WALL);
+	for (int x = 5; x <= 6; ++x)
+		map[13 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	for (int x = 5; x <= 7; ++x)
+		map[17 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	for (int y = 13; y <= 17; ++y) {
+		map[y * PACMAN_MAP_WIDTH + 12] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 16] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 28] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 32] = get_sprite(WALL);
+	}
+	for (int y = 13; y <= 15; ++y) {
+		map[y * PACMAN_MAP_WIDTH + 14] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 24] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 26] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 34] = get_sprite(WALL);
+	}
+	for (int y = 14; y <= 17; ++y) {
+		map[y * PACMAN_MAP_WIDTH + 20] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 22] = get_sprite(WALL);
+	}
+	for (int y = 15; y <= 17; ++y)
+		map[y * PACMAN_MAP_WIDTH + 25] = get_sprite(WALL);
+	for (int y = 15; y <= 16; ++y)
+		map[y * PACMAN_MAP_WIDTH + 33] = get_sprite(WALL);
+	for (int x = 29; x <= 30; ++x) {
+		map[13 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+		map[15 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+		map[17 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	}
+	for (int x = 17; x <= 18; ++x)
+		map[17 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+
+	map[13 * PACMAN_MAP_WIDTH + 13] = get_sprite(WALL);
+	map[15 * PACMAN_MAP_WIDTH + 13] = get_sprite(WALL);
+	map[13 * PACMAN_MAP_WIDTH + 21] = get_sprite(WALL);
+	map[15 * PACMAN_MAP_WIDTH + 21] = get_sprite(WALL);
+	map[13 * PACMAN_MAP_WIDTH + 33] = get_sprite(WALL);
+	map[17 * PACMAN_MAP_WIDTH + 34] = get_sprite(WALL);
+	// 2 player
+	for (int x = 5; x <= 7; ++x) {
+		map[21 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+		map[23 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+		map[25 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	}
+	map[22 * PACMAN_MAP_WIDTH + 7] = get_sprite(WALL);
+	map[24 * PACMAN_MAP_WIDTH + 5] = get_sprite(WALL);
+	for (int y = 21; y <= 25; ++y) {
+		map[y * PACMAN_MAP_WIDTH + 12] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 16] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 28] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 32] = get_sprite(WALL);
+	}
+	for (int y = 21; y <= 23; ++y) {
+		map[y * PACMAN_MAP_WIDTH + 14] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 24] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 26] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 34] = get_sprite(WALL);
+	}
+	for (int y = 22; y <= 25; ++y) {
+		map[y * PACMAN_MAP_WIDTH + 20] = get_sprite(WALL);
+		map[y * PACMAN_MAP_WIDTH + 22] = get_sprite(WALL);
+	}
+	for (int y = 23; y <= 25; ++y)
+		map[y * PACMAN_MAP_WIDTH + 25] = get_sprite(WALL);
+	for (int y = 23; y <= 24; ++y)
+		map[y * PACMAN_MAP_WIDTH + 33] = get_sprite(WALL);
+	for (int x = 29; x <= 30; ++x) {
+		map[21 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+		map[23 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+		map[25 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+	}
+	for (int x = 17; x <= 18; ++x)
+		map[25 * PACMAN_MAP_WIDTH + x] = get_sprite(WALL);
+
+	map[21 * PACMAN_MAP_WIDTH + 13] = get_sprite(WALL);
+	map[23 * PACMAN_MAP_WIDTH + 13] = get_sprite(WALL);
+	map[21 * PACMAN_MAP_WIDTH + 21] = get_sprite(WALL);
+	map[23 * PACMAN_MAP_WIDTH + 21] = get_sprite(WALL);
+	map[21 * PACMAN_MAP_WIDTH + 33] = get_sprite(WALL);
+	map[25 * PACMAN_MAP_WIDTH + 34] = get_sprite(WALL);
+}
+
 int can_walk(int *map, int x, int y)
 {
 	if (x == -1 || y == -1 || x == PACMAN_MAP_WIDTH || y == PACMAN_MAP_HEIGHT) {
@@ -530,7 +670,7 @@ int can_walk(int *map, int x, int y)
 void show_score(int *map, int score)
 {
 	for (int i = 0; i < 6; ++i) {
-		map[PACMAN_MAP_WIDTH + 15 + i] = 62 + i;
+		map[PACMAN_MAP_WIDTH + 15 + i] = SCORE_ + i;
 	}
 	map[PACMAN_MAP_WIDTH + 15 + 6] = NUMBER_BASE + score / 1000;
 	map[PACMAN_MAP_WIDTH + 15 + 7] = NUMBER_BASE + (score / 100) % 10;

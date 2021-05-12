@@ -2,10 +2,7 @@
 module pacman_soc (
 	clk_clk,
 	control_export,
-	hex_digits_export,
 	key_external_connection_export,
-	keycode_export,
-	leds_export,
 	reset_reset_n,
 	sdram_clk_clk,
 	sdram_wire_addr,
@@ -27,10 +24,7 @@ module pacman_soc (
 
 	input		clk_clk;
 	output	[31:0]	control_export;
-	output	[15:0]	hex_digits_export;
 	input	[1:0]	key_external_connection_export;
-	output	[7:0]	keycode_export;
-	output	[13:0]	leds_export;
 	input		reset_reset_n;
 	output		sdram_clk_clk;
 	output	[12:0]	sdram_wire_addr;

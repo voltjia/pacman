@@ -255,4 +255,6 @@ set_global_assignment -name SYSTEMVERILOG_FILE vga_controller.sv
 set_global_assignment -name SYSTEMVERILOG_FILE hex_driver.sv
 set_global_assignment -name SYSTEMVERILOG_FILE color_mapper.sv
 set_global_assignment -name SYSTEMVERILOG_FILE pacman.sv
+set_global_assignment -name FLOW_ENABLE_POWER_ANALYZER ON
+set_global_assignment -name POWER_DEFAULT_INPUT_IO_TOGGLE_RATE "12.5 %"
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

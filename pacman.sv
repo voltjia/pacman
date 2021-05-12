@@ -1,7 +1,5 @@
 module pacman (input         MAX10_CLK1_50,
                input  [1:0]  KEY,
-               input  [9:0]  SW,
-               output [9:0]  LEDR,
                output [7:0]  HEX0,
                output [7:0]  HEX1,
                output [7:0]  HEX2,
@@ -32,10 +30,6 @@ module pacman (input         MAX10_CLK1_50,
    logic [9:0]   pixel_x, pixel_y;
    logic [31:0]  control;
 	logic SPI_CS_N, SPI_SCLK, SPI_MISO, SPI_MOSI, USB_GPX, USB_IRQ, USB_RST;
-//   logic [31:0]  gpio_0_in, gpio_0_out;
-//   logic [31:0]  gpio_1_in, gpio_1_out;
-//   logic [31:0]  gpio_2_in, gpio_2_out;
-//   logic [31:0]  gpio_3_in, gpio_3_out;
 
 //=======================================================
 //  Structural coding
@@ -71,15 +65,6 @@ module pacman (input         MAX10_CLK1_50,
    assign VGA_R = pixel_red;
    assign VGA_G = pixel_green;
    assign VGA_B = pixel_blue;
-
-   /*
-   hex_driver hex_driver5 (.in(sdram_pixel_address[23:20]), .out(HEX5));
-   hex_driver hex_driver4 (.in(sdram_pixel_address[19:16]), .out(HEX4));
-   hex_driver hex_driver3 (.in(sdram_pixel_address[15:12]), .out(HEX3));
-   hex_driver hex_driver2 (.in(sdram_pixel_address[11:8]), .out(HEX2));
-   hex_driver hex_driver1 (.in(sdram_pixel_address[7:4]), .out(HEX1));
-   hex_driver hex_driver0 (.in(sdram_pixel_address[3:0]), .out(HEX0));
-   */
 
    vga_controller vga_controller (
       .clk(MAX10_CLK1_50),
@@ -134,21 +119,7 @@ module pacman (input         MAX10_CLK1_50,
 
       // Control
       .control_export(control),
-		
-		//LEDs and HEX
-		.hex_digits_export({hex_num_4, hex_num_3, hex_num_1, hex_num_0}),
-		.leds_export({hundreds, signs, LEDR}),
-		.keycode_export(keycode)
 
-      // GPIOs
-//      .gpio_0_in_port(gpio_0_in),
-//      .gpio_0_out_port(gpio_0_out),
-//      .gpio_1_in_port(gpio_1_in),
-//      .gpio_1_out_port(gpio_1_out),
-//      .gpio_2_in_port(gpio_2_in),
-//      .gpio_2_out_port(gpio_2_out),
-//      .gpio_3_in_port(gpio_3_in),
-//      .gpio_3_out_port(gpio_3_out)
 	);
 
 endmodule

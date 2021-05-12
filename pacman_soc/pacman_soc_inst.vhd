@@ -2,10 +2,7 @@
 		port (
 			clk_clk                        : in    std_logic                     := 'X';             -- clk
 			control_export                 : out   std_logic_vector(31 downto 0);                    -- export
-			hex_digits_export              : out   std_logic_vector(15 downto 0);                    -- export
 			key_external_connection_export : in    std_logic_vector(1 downto 0)  := (others => 'X'); -- export
-			keycode_export                 : out   std_logic_vector(7 downto 0);                     -- export
-			leds_export                    : out   std_logic_vector(13 downto 0);                    -- export
 			reset_reset_n                  : in    std_logic                     := 'X';             -- reset_n
 			sdram_clk_clk                  : out   std_logic;                                        -- clk
 			sdram_wire_addr                : out   std_logic_vector(12 downto 0);                    -- addr
@@ -31,10 +28,7 @@
 		port map (
 			clk_clk                        => CONNECTED_TO_clk_clk,                        --                     clk.clk
 			control_export                 => CONNECTED_TO_control_export,                 --                 control.export
-			hex_digits_export              => CONNECTED_TO_hex_digits_export,              --              hex_digits.export
 			key_external_connection_export => CONNECTED_TO_key_external_connection_export, -- key_external_connection.export
-			keycode_export                 => CONNECTED_TO_keycode_export,                 --                 keycode.export
-			leds_export                    => CONNECTED_TO_leds_export,                    --                    leds.export
 			reset_reset_n                  => CONNECTED_TO_reset_reset_n,                  --                   reset.reset_n
 			sdram_clk_clk                  => CONNECTED_TO_sdram_clk_clk,                  --               sdram_clk.clk
 			sdram_wire_addr                => CONNECTED_TO_sdram_wire_addr,                --              sdram_wire.addr

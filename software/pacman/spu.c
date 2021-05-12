@@ -1,8 +1,8 @@
 /*
  * spu.c
  *
- *  Created on: 2021Äê4ÔÂ28ÈÕ
- *      Author: user
+ *  Created on: 2021/04/28
+ *      Author: Wenhao Tan & Jiacheng Huang
  */
 
 #include "spu.h"

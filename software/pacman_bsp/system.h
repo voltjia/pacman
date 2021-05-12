@@ -4,7 +4,7 @@
  * Machine generated for CPU 'nios2_processor' in SOPC Builder design 'pacman_soc'
  * SOPC Builder design path: ../../pacman_soc.sopcinfo
  *
- * Generated: Sat May 08 05:54:32 CST 2021
+ * Generated: Wed May 12 01:06:20 CDT 2021
  */
 
 /*
@@ -219,33 +219,6 @@
 
 
 /*
- * hex_digits_pio configuration
- *
- */
-
-#define ALT_MODULE_CLASS_hex_digits_pio altera_avalon_pio
-#define HEX_DIGITS_PIO_BASE 0x8001170
-#define HEX_DIGITS_PIO_BIT_CLEARING_EDGE_REGISTER 0
-#define HEX_DIGITS_PIO_BIT_MODIFYING_OUTPUT_REGISTER 0
-#define HEX_DIGITS_PIO_CAPTURE 0
-#define HEX_DIGITS_PIO_DATA_WIDTH 16
-#define HEX_DIGITS_PIO_DO_TEST_BENCH_WIRING 0
-#define HEX_DIGITS_PIO_DRIVEN_SIM_VALUE 0
-#define HEX_DIGITS_PIO_EDGE_TYPE "NONE"
-#define HEX_DIGITS_PIO_FREQ 50000000
-#define HEX_DIGITS_PIO_HAS_IN 0
-#define HEX_DIGITS_PIO_HAS_OUT 1
-#define HEX_DIGITS_PIO_HAS_TRI 0
-#define HEX_DIGITS_PIO_IRQ -1
-#define HEX_DIGITS_PIO_IRQ_INTERRUPT_CONTROLLER_ID -1
-#define HEX_DIGITS_PIO_IRQ_TYPE "NONE"
-#define HEX_DIGITS_PIO_NAME "/dev/hex_digits_pio"
-#define HEX_DIGITS_PIO_RESET_VALUE 0
-#define HEX_DIGITS_PIO_SPAN 16
-#define HEX_DIGITS_PIO_TYPE "altera_avalon_pio"
-
-
-/*
  * jtag_uart configuration
  *
  */
@@ -288,60 +261,6 @@
 #define KEY_RESET_VALUE 0
 #define KEY_SPAN 16
 #define KEY_TYPE "altera_avalon_pio"
-
-
-/*
- * keycode configuration
- *
- */
-
-#define ALT_MODULE_CLASS_keycode altera_avalon_pio
-#define KEYCODE_BASE 0x80011b0
-#define KEYCODE_BIT_CLEARING_EDGE_REGISTER 0
-#define KEYCODE_BIT_MODIFYING_OUTPUT_REGISTER 0
-#define KEYCODE_CAPTURE 0
-#define KEYCODE_DATA_WIDTH 8
-#define KEYCODE_DO_TEST_BENCH_WIRING 0
-#define KEYCODE_DRIVEN_SIM_VALUE 0
-#define KEYCODE_EDGE_TYPE "NONE"
-#define KEYCODE_FREQ 50000000
-#define KEYCODE_HAS_IN 0
-#define KEYCODE_HAS_OUT 1
-#define KEYCODE_HAS_TRI 0
-#define KEYCODE_IRQ -1
-#define KEYCODE_IRQ_INTERRUPT_CONTROLLER_ID -1
-#define KEYCODE_IRQ_TYPE "NONE"
-#define KEYCODE_NAME "/dev/keycode"
-#define KEYCODE_RESET_VALUE 0
-#define KEYCODE_SPAN 16
-#define KEYCODE_TYPE "altera_avalon_pio"
-
-
-/*
- * leds_pio configuration
- *
- */
-
-#define ALT_MODULE_CLASS_leds_pio altera_avalon_pio
-#define LEDS_PIO_BASE 0x8001160
-#define LEDS_PIO_BIT_CLEARING_EDGE_REGISTER 0
-#define LEDS_PIO_BIT_MODIFYING_OUTPUT_REGISTER 0
-#define LEDS_PIO_CAPTURE 0
-#define LEDS_PIO_DATA_WIDTH 14
-#define LEDS_PIO_DO_TEST_BENCH_WIRING 0
-#define LEDS_PIO_DRIVEN_SIM_VALUE 0
-#define LEDS_PIO_EDGE_TYPE "NONE"
-#define LEDS_PIO_FREQ 50000000
-#define LEDS_PIO_HAS_IN 0
-#define LEDS_PIO_HAS_OUT 1
-#define LEDS_PIO_HAS_TRI 0
-#define LEDS_PIO_IRQ -1
-#define LEDS_PIO_IRQ_INTERRUPT_CONTROLLER_ID -1
-#define LEDS_PIO_IRQ_TYPE "NONE"
-#define LEDS_PIO_NAME "/dev/leds_pio"
-#define LEDS_PIO_RESET_VALUE 0
-#define LEDS_PIO_SPAN 16
-#define LEDS_PIO_TYPE "altera_avalon_pio"
 
 
 /*
@@ -469,7 +388,7 @@
 #define SYSID_QSYS_IRQ_INTERRUPT_CONTROLLER_ID -1
 #define SYSID_QSYS_NAME "/dev/sysid_qsys"
 #define SYSID_QSYS_SPAN 8
-#define SYSID_QSYS_TIMESTAMP 1620394867
+#define SYSID_QSYS_TIMESTAMP 1620786980
 #define SYSID_QSYS_TYPE "altera_avalon_sysid_qsys"
 
 

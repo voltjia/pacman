@@ -1,8 +1,8 @@
 /*
  * pacman.h
  *
- *  Created on: 2021��4��30��
- *      Author: user
+ *  Created on: 2021/04/30
+ *      Author: Wenhao Tan & Jiacheng Huang
  */
 
 #ifndef PACMAN_H_
@@ -59,13 +59,10 @@
 #define FOOD_BASE 49
 #define WALL_BASE 51
 #define NUMBER_BASE 52
-#define ALPHABET_S 62
-#define ALPHABET_C 63
-#define ALPHABET_O 64
-#define ALPHABET_R 65
-#define ALPHABET_E 66
-#define ALPHABET_COLON 67
-#define SPRITE_COUNT 68
+#define SCORE_ 62
+#define ENTER 68
+#define SPACE 73
+#define SPRITE_COUNT 78
 
 void spawn_all_sprites(int *map);
 int sprite_index(int sprite);
@@ -79,11 +76,12 @@ int map_get_sprite(int *map, int x, int y);
 int map_set_sprite(int *map, int x, int y, int sprite);
 int next_sprite(int sprite);
 int animate_map(int *map);
-int random_sprite();
-void random_map(int *map);
+//int random_sprite();
+//void random_map(int *map);
 void main_map(int *map);
 void game_over(int *map);
 void you_win(int *map);
+void start_menu(int * map);
 int can_walk(int *map, int x, int y);
 void show_score(int *map, int score);
 

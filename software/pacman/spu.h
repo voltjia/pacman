@@ -1,8 +1,8 @@
 /*
  * spu.h
  *
- *  Created on: 2021Äê4ÔÂ28ÈÕ
- *      Author: user
+ *  Created on: 2021/04/28
+ *      Author: Wenhao Tan & Jiacheng Huang
  */
 
 #ifndef SPU_H_

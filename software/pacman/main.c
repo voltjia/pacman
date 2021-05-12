@@ -51,7 +51,7 @@ int ghost_ys[4] = {10, 10, 11, 11};
 
 int score = 0;
 int two_player = 0;
-int is_game_over = 0;
+int is_game_over = 1;
 
 BYTE GetDriverandReport()
 {
@@ -140,6 +140,7 @@ void ghost_go(int *map, int index)
 			if (sprite_type(under_ghost[index]) == PACMAN) {
 				game_over(map);
 				is_game_over = 1;
+				return;
 			}
 			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
 			return;
@@ -153,6 +154,7 @@ void ghost_go(int *map, int index)
 			if (sprite_type(under_ghost[index]) == PACMAN) {
 				game_over(map);
 				is_game_over = 1;
+				return;
 			}
 			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
 			return;
@@ -166,6 +168,7 @@ void ghost_go(int *map, int index)
 			if (sprite_type(under_ghost[index]) == PACMAN) {
 				game_over(map);
 				is_game_over = 1;
+				return;
 			}
 			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
 			return;
@@ -179,13 +182,14 @@ void ghost_go(int *map, int index)
 			if (sprite_type(under_ghost[index]) == PACMAN) {
 				game_over(map);
 				is_game_over = 1;
+				return;
 			}
 			map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
 			return;
 		}
 		break;
 	}
-
+	// if cannot move forward
 	randomly_change_direction(map, *(ghost_xs + index), *(ghost_ys + index));
 	ghost = map_get_sprite(map, *(ghost_xs + index), *(ghost_ys + index));
 
@@ -196,6 +200,7 @@ void ghost_go(int *map, int index)
 		if (sprite_type(under_ghost[index]) == PACMAN) {
 			game_over(map);
 			is_game_over = 1;
+			return;
 		}
 		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
 	} else if (can_walk(map, *(ghost_xs + index), *(ghost_ys + index) + 1)) {
@@ -205,6 +210,7 @@ void ghost_go(int *map, int index)
 		if (sprite_type(under_ghost[index]) == PACMAN) {
 			game_over(map);
 			is_game_over = 1;
+			return;
 		}
 		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
 	} else if (can_walk(map, *(ghost_xs + index) - 1, *(ghost_ys + index))) {
@@ -214,6 +220,7 @@ void ghost_go(int *map, int index)
 		if (sprite_type(under_ghost[index]) == PACMAN) {
 			game_over(map);
 			is_game_over = 1;
+			return;
 		}
 		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
 	} else if (can_walk(map, *(ghost_xs + index) + 1, *(ghost_ys + index))) {
@@ -223,6 +230,7 @@ void ghost_go(int *map, int index)
 		if (sprite_type(under_ghost[index]) == PACMAN) {
 			game_over(map);
 			is_game_over = 1;
+			return;
 		}
 		map_set_sprite(map, *(ghost_xs + index), *(ghost_ys + index), ghost);
 	}
@@ -294,6 +302,11 @@ void pacman_task()
 
 	for (int i = 0; i < 4; ++i) {
 		ghost_go(map, i);
+		if (is_game_over) {
+			show_score(map, score);
+			spu_set_map(map);
+			return;
+		}
 	}
 
 	animate_map(map);
@@ -509,23 +522,28 @@ int main()
 	BYTE runningdebugflag = 0;//flag to dump out a bunch of information when we first get to USB_STATE_RUNNING
 	BYTE errorflag = 0; //flag once we get an error device so we don't keep dumping out state info
 	BYTE device;
-	WORD keycode;
 
 	MAX3421E_init();
 	USB_init();
-	init_game();
+
+	start_menu(map);
+	spu_set_map(map);
 
 	printf("PacPac\n");
 
 	for (int i = 0; ; ++i) {
 		MAX3421E_Task();
 		USB_Task();
-		if (key0 == 0x28) {
+		int start = IORD_ALTERA_AVALON_PIO_DATA(KEY_BASE);
+		if (start != 3 || key0 == 0x29) {
+			start_menu(map);
+			spu_set_map(map);
+			is_game_over = 1;
+	    }
+		if (key0 == 0x28)
 			init_game();
-		}
-		if (key0 == 0x2c) {
+		if (key0 == 0x2c)
 			init_2game();
-		}
 		if (!is_game_over) {
 			if (two_player)
 				two_player_task();
@@ -552,12 +570,12 @@ int main()
 					printf("%x ", kbdbuf.keycode[n]);
 				}
 				BYTE temp = kbdbuf.keycode[0];
-				if (temp == 0x52 || temp == 0x51 || temp == 0x50 || temp == 0x4f || temp == 0x28 || temp == 0x2c) {
-					key0 = temp;
-					key1 = kbdbuf.keycode[1];
-				} else {
-					key0 = kbdbuf.keycode[1];
+				if (temp == KEY_W || temp == KEY_A || temp == KEY_S || temp == KEY_D) {
 					key1 = temp;
+					key0 = kbdbuf.keycode[1];
+				} else {
+					key1 = kbdbuf.keycode[1];
+					key0 = temp;
 				}
 				printf("\n");
 			}

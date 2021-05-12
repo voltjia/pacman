@@ -1,10 +1,7 @@
 	pacman_soc u0 (
 		.clk_clk                        (<connected-to-clk_clk>),                        //                     clk.clk
 		.control_export                 (<connected-to-control_export>),                 //                 control.export
-		.hex_digits_export              (<connected-to-hex_digits_export>),              //              hex_digits.export
 		.key_external_connection_export (<connected-to-key_external_connection_export>), // key_external_connection.export
-		.keycode_export                 (<connected-to-keycode_export>),                 //                 keycode.export
-		.leds_export                    (<connected-to-leds_export>),                    //                    leds.export
 		.reset_reset_n                  (<connected-to-reset_reset_n>),                  //                   reset.reset_n
 		.sdram_clk_clk                  (<connected-to-sdram_clk_clk>),                  //               sdram_clk.clk
 		.sdram_wire_addr                (<connected-to-sdram_wire_addr>),                //              sdram_wire.addr

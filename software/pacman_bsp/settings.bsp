@@ -2,9 +2,9 @@
 <sch:Settings xmlns:sch="http://www.altera.com/embeddedsw/bsp/schema">
         <BspType>hal</BspType>
         <BspVersion>default</BspVersion>
-        <BspGeneratedTimeStamp>2021-5-8 5:54:32</BspGeneratedTimeStamp>
-        <BspGeneratedUnixTimeStamp>1620424472509</BspGeneratedUnixTimeStamp>
-        <BspGeneratedLocation>D:\ECE385\pacman\software\pacman_bsp</BspGeneratedLocation>
+        <BspGeneratedTimeStamp>May 12, 2021 1:06:18 AM</BspGeneratedTimeStamp>
+        <BspGeneratedUnixTimeStamp>1620799578748</BspGeneratedUnixTimeStamp>
+        <BspGeneratedLocation>C:\Users\tanwe\Documents\GitHub\pacman\software\pacman_bsp</BspGeneratedLocation>
         <BspSettingsFile>settings.bsp</BspSettingsFile>
         <SopcDesignFile>..\..\pacman_soc.sopcinfo</SopcDesignFile>
         <JdiFile>default</JdiFile>
@@ -929,18 +929,6 @@
                 <attributes/>
         </MemoryMap>
         <MemoryMap>
-                <slaveDescriptor>leds_pio</slaveDescriptor>
-                <addressRange>0x08001160 - 0x0800116F</addressRange>
-                <addressSpan>16</addressSpan>
-                <attributes/>
-        </MemoryMap>
-        <MemoryMap>
-                <slaveDescriptor>hex_digits_pio</slaveDescriptor>
-                <addressRange>0x08001170 - 0x0800117F</addressRange>
-                <addressSpan>16</addressSpan>
-                <attributes/>
-        </MemoryMap>
-        <MemoryMap>
                 <slaveDescriptor>usb_rst</slaveDescriptor>
                 <addressRange>0x08001180 - 0x0800118F</addressRange>
                 <addressSpan>16</addressSpan>
@@ -955,12 +943,6 @@
         <MemoryMap>
                 <slaveDescriptor>usb_irq</slaveDescriptor>
                 <addressRange>0x080011A0 - 0x080011AF</addressRange>
-                <addressSpan>16</addressSpan>
-                <attributes/>
-        </MemoryMap>
-        <MemoryMap>
-                <slaveDescriptor>keycode</slaveDescriptor>
-                <addressRange>0x080011B0 - 0x080011BF</addressRange>
                 <addressSpan>16</addressSpan>
                 <attributes/>
         </MemoryMap>

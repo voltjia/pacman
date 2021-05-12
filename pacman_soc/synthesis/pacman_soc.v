@@ -6,10 +6,7 @@
 module pacman_soc (
 		input  wire        clk_clk,                        //                     clk.clk
 		output wire [31:0] control_export,                 //                 control.export
-		output wire [15:0] hex_digits_export,              //              hex_digits.export
 		input  wire [1:0]  key_external_connection_export, // key_external_connection.export
-		output wire [7:0]  keycode_export,                 //                 keycode.export
-		output wire [13:0] leds_export,                    //                    leds.export
 		input  wire        reset_reset_n,                  //                   reset.reset_n
 		output wire        sdram_clk_clk,                  //               sdram_clk.clk
 		output wire [12:0] sdram_wire_addr,                //              sdram_wire.addr
@@ -76,11 +73,6 @@ module pacman_soc (
 	wire  [15:0] mm_interconnect_0_sdram_s1_writedata;                          // mm_interconnect_0:sdram_s1_writedata -> sdram:az_data
 	wire  [31:0] mm_interconnect_0_key_s1_readdata;                             // key:readdata -> mm_interconnect_0:key_s1_readdata
 	wire   [1:0] mm_interconnect_0_key_s1_address;                              // mm_interconnect_0:key_s1_address -> key:address
-	wire         mm_interconnect_0_keycode_s1_chipselect;                       // mm_interconnect_0:keycode_s1_chipselect -> keycode:chipselect
-	wire  [31:0] mm_interconnect_0_keycode_s1_readdata;                         // keycode:readdata -> mm_interconnect_0:keycode_s1_readdata
-	wire   [1:0] mm_interconnect_0_keycode_s1_address;                          // mm_interconnect_0:keycode_s1_address -> keycode:address
-	wire         mm_interconnect_0_keycode_s1_write;                            // mm_interconnect_0:keycode_s1_write -> keycode:write_n
-	wire  [31:0] mm_interconnect_0_keycode_s1_writedata;                        // mm_interconnect_0:keycode_s1_writedata -> keycode:writedata
 	wire  [31:0] mm_interconnect_0_usb_irq_s1_readdata;                         // usb_irq:readdata -> mm_interconnect_0:usb_irq_s1_readdata
 	wire   [1:0] mm_interconnect_0_usb_irq_s1_address;                          // mm_interconnect_0:usb_irq_s1_address -> usb_irq:address
 	wire  [31:0] mm_interconnect_0_usb_gpx_s1_readdata;                         // usb_gpx:readdata -> mm_interconnect_0:usb_gpx_s1_readdata
@@ -90,16 +82,6 @@ module pacman_soc (
 	wire   [1:0] mm_interconnect_0_usb_rst_s1_address;                          // mm_interconnect_0:usb_rst_s1_address -> usb_rst:address
 	wire         mm_interconnect_0_usb_rst_s1_write;                            // mm_interconnect_0:usb_rst_s1_write -> usb_rst:write_n
 	wire  [31:0] mm_interconnect_0_usb_rst_s1_writedata;                        // mm_interconnect_0:usb_rst_s1_writedata -> usb_rst:writedata
-	wire         mm_interconnect_0_hex_digits_pio_s1_chipselect;                // mm_interconnect_0:hex_digits_pio_s1_chipselect -> hex_digits_pio:chipselect
-	wire  [31:0] mm_interconnect_0_hex_digits_pio_s1_readdata;                  // hex_digits_pio:readdata -> mm_interconnect_0:hex_digits_pio_s1_readdata
-	wire   [1:0] mm_interconnect_0_hex_digits_pio_s1_address;                   // mm_interconnect_0:hex_digits_pio_s1_address -> hex_digits_pio:address
-	wire         mm_interconnect_0_hex_digits_pio_s1_write;                     // mm_interconnect_0:hex_digits_pio_s1_write -> hex_digits_pio:write_n
-	wire  [31:0] mm_interconnect_0_hex_digits_pio_s1_writedata;                 // mm_interconnect_0:hex_digits_pio_s1_writedata -> hex_digits_pio:writedata
-	wire         mm_interconnect_0_leds_pio_s1_chipselect;                      // mm_interconnect_0:leds_pio_s1_chipselect -> leds_pio:chipselect
-	wire  [31:0] mm_interconnect_0_leds_pio_s1_readdata;                        // leds_pio:readdata -> mm_interconnect_0:leds_pio_s1_readdata
-	wire   [1:0] mm_interconnect_0_leds_pio_s1_address;                         // mm_interconnect_0:leds_pio_s1_address -> leds_pio:address
-	wire         mm_interconnect_0_leds_pio_s1_write;                           // mm_interconnect_0:leds_pio_s1_write -> leds_pio:write_n
-	wire  [31:0] mm_interconnect_0_leds_pio_s1_writedata;                       // mm_interconnect_0:leds_pio_s1_writedata -> leds_pio:writedata
 	wire         mm_interconnect_0_timer_s1_chipselect;                         // mm_interconnect_0:timer_s1_chipselect -> timer:chipselect
 	wire  [15:0] mm_interconnect_0_timer_s1_readdata;                           // timer:readdata -> mm_interconnect_0:timer_s1_readdata
 	wire   [3:0] mm_interconnect_0_timer_s1_address;                            // mm_interconnect_0:timer_s1_address -> timer:address
@@ -127,7 +109,7 @@ module pacman_soc (
 	wire         irq_mapper_receiver1_irq;                                      // timer:irq -> irq_mapper:receiver1_irq
 	wire         irq_mapper_receiver2_irq;                                      // spi:irq -> irq_mapper:receiver2_irq
 	wire  [31:0] nios2_processor_irq_irq;                                       // irq_mapper:sender_irq -> nios2_processor:irq
-	wire         rst_controller_reset_out_reset;                                // rst_controller:reset_out -> [control:reset_n, hex_digits_pio:reset_n, irq_mapper:reset, jtag_uart:rst_n, key:reset_n, keycode:reset_n, leds_pio:reset_n, mm_interconnect_0:nios2_processor_reset_reset_bridge_in_reset_reset, nios2_processor:reset_n, onchip_memory:reset, rst_translator:in_reset, sdram_pll:reset, spi:reset_n, sysid_qsys:reset_n, timer:reset_n, usb_gpx:reset_n, usb_irq:reset_n, usb_rst:reset_n]
+	wire         rst_controller_reset_out_reset;                                // rst_controller:reset_out -> [control:reset_n, irq_mapper:reset, jtag_uart:rst_n, key:reset_n, mm_interconnect_0:nios2_processor_reset_reset_bridge_in_reset_reset, nios2_processor:reset_n, onchip_memory:reset, rst_translator:in_reset, sdram_pll:reset, spi:reset_n, sysid_qsys:reset_n, timer:reset_n, usb_gpx:reset_n, usb_irq:reset_n, usb_rst:reset_n]
 	wire         rst_controller_reset_out_reset_req;                            // rst_controller:reset_req -> [nios2_processor:reset_req, onchip_memory:reset_req, rst_translator:reset_req_in]
 	wire         nios2_processor_debug_reset_request_reset;                     // nios2_processor:debug_reset_request -> [rst_controller:reset_in1, rst_controller_001:reset_in1]
 	wire         rst_controller_001_reset_out_reset;                            // rst_controller_001:reset_out -> [mm_interconnect_0:sdram_reset_reset_bridge_in_reset_reset, sdram:reset_n]
@@ -141,17 +123,6 @@ module pacman_soc (
 		.chipselect (mm_interconnect_0_control_s1_chipselect), //                    .chipselect
 		.readdata   (mm_interconnect_0_control_s1_readdata),   //                    .readdata
 		.out_port   (control_export)                           // external_connection.export
-	);
-
-	pacman_soc_hex_digits_pio hex_digits_pio (
-		.clk        (clk_clk),                                        //                 clk.clk
-		.reset_n    (~rst_controller_reset_out_reset),                //               reset.reset_n
-		.address    (mm_interconnect_0_hex_digits_pio_s1_address),    //                  s1.address
-		.write_n    (~mm_interconnect_0_hex_digits_pio_s1_write),     //                    .write_n
-		.writedata  (mm_interconnect_0_hex_digits_pio_s1_writedata),  //                    .writedata
-		.chipselect (mm_interconnect_0_hex_digits_pio_s1_chipselect), //                    .chipselect
-		.readdata   (mm_interconnect_0_hex_digits_pio_s1_readdata),   //                    .readdata
-		.out_port   (hex_digits_export)                               // external_connection.export
 	);
 
 	pacman_soc_jtag_uart jtag_uart (
@@ -173,28 +144,6 @@ module pacman_soc (
 		.address  (mm_interconnect_0_key_s1_address),  //                  s1.address
 		.readdata (mm_interconnect_0_key_s1_readdata), //                    .readdata
 		.in_port  (key_external_connection_export)     // external_connection.export
-	);
-
-	pacman_soc_keycode keycode (
-		.clk        (clk_clk),                                 //                 clk.clk
-		.reset_n    (~rst_controller_reset_out_reset),         //               reset.reset_n
-		.address    (mm_interconnect_0_keycode_s1_address),    //                  s1.address
-		.write_n    (~mm_interconnect_0_keycode_s1_write),     //                    .write_n
-		.writedata  (mm_interconnect_0_keycode_s1_writedata),  //                    .writedata
-		.chipselect (mm_interconnect_0_keycode_s1_chipselect), //                    .chipselect
-		.readdata   (mm_interconnect_0_keycode_s1_readdata),   //                    .readdata
-		.out_port   (keycode_export)                           // external_connection.export
-	);
-
-	pacman_soc_leds_pio leds_pio (
-		.clk        (clk_clk),                                  //                 clk.clk
-		.reset_n    (~rst_controller_reset_out_reset),          //               reset.reset_n
-		.address    (mm_interconnect_0_leds_pio_s1_address),    //                  s1.address
-		.write_n    (~mm_interconnect_0_leds_pio_s1_write),     //                    .write_n
-		.writedata  (mm_interconnect_0_leds_pio_s1_writedata),  //                    .writedata
-		.chipselect (mm_interconnect_0_leds_pio_s1_chipselect), //                    .chipselect
-		.readdata   (mm_interconnect_0_leds_pio_s1_readdata),   //                    .readdata
-		.out_port   (leds_export)                               // external_connection.export
 	);
 
 	pacman_soc_nios2_processor nios2_processor (
@@ -373,11 +322,6 @@ module pacman_soc (
 		.control_s1_readdata                               (mm_interconnect_0_control_s1_readdata),                         //                                            .readdata
 		.control_s1_writedata                              (mm_interconnect_0_control_s1_writedata),                        //                                            .writedata
 		.control_s1_chipselect                             (mm_interconnect_0_control_s1_chipselect),                       //                                            .chipselect
-		.hex_digits_pio_s1_address                         (mm_interconnect_0_hex_digits_pio_s1_address),                   //                           hex_digits_pio_s1.address
-		.hex_digits_pio_s1_write                           (mm_interconnect_0_hex_digits_pio_s1_write),                     //                                            .write
-		.hex_digits_pio_s1_readdata                        (mm_interconnect_0_hex_digits_pio_s1_readdata),                  //                                            .readdata
-		.hex_digits_pio_s1_writedata                       (mm_interconnect_0_hex_digits_pio_s1_writedata),                 //                                            .writedata
-		.hex_digits_pio_s1_chipselect                      (mm_interconnect_0_hex_digits_pio_s1_chipselect),                //                                            .chipselect
 		.jtag_uart_avalon_jtag_slave_address               (mm_interconnect_0_jtag_uart_avalon_jtag_slave_address),         //                 jtag_uart_avalon_jtag_slave.address
 		.jtag_uart_avalon_jtag_slave_write                 (mm_interconnect_0_jtag_uart_avalon_jtag_slave_write),           //                                            .write
 		.jtag_uart_avalon_jtag_slave_read                  (mm_interconnect_0_jtag_uart_avalon_jtag_slave_read),            //                                            .read
@@ -387,16 +331,6 @@ module pacman_soc (
 		.jtag_uart_avalon_jtag_slave_chipselect            (mm_interconnect_0_jtag_uart_avalon_jtag_slave_chipselect),      //                                            .chipselect
 		.key_s1_address                                    (mm_interconnect_0_key_s1_address),                              //                                      key_s1.address
 		.key_s1_readdata                                   (mm_interconnect_0_key_s1_readdata),                             //                                            .readdata
-		.keycode_s1_address                                (mm_interconnect_0_keycode_s1_address),                          //                                  keycode_s1.address
-		.keycode_s1_write                                  (mm_interconnect_0_keycode_s1_write),                            //                                            .write
-		.keycode_s1_readdata                               (mm_interconnect_0_keycode_s1_readdata),                         //                                            .readdata
-		.keycode_s1_writedata                              (mm_interconnect_0_keycode_s1_writedata),                        //                                            .writedata
-		.keycode_s1_chipselect                             (mm_interconnect_0_keycode_s1_chipselect),                       //                                            .chipselect
-		.leds_pio_s1_address                               (mm_interconnect_0_leds_pio_s1_address),                         //                                 leds_pio_s1.address
-		.leds_pio_s1_write                                 (mm_interconnect_0_leds_pio_s1_write),                           //                                            .write
-		.leds_pio_s1_readdata                              (mm_interconnect_0_leds_pio_s1_readdata),                        //                                            .readdata
-		.leds_pio_s1_writedata                             (mm_interconnect_0_leds_pio_s1_writedata),                       //                                            .writedata
-		.leds_pio_s1_chipselect                            (mm_interconnect_0_leds_pio_s1_chipselect),                      //                                            .chipselect
 		.nios2_processor_debug_mem_slave_address           (mm_interconnect_0_nios2_processor_debug_mem_slave_address),     //             nios2_processor_debug_mem_slave.address
 		.nios2_processor_debug_mem_slave_write             (mm_interconnect_0_nios2_processor_debug_mem_slave_write),       //                                            .write
 		.nios2_processor_debug_mem_slave_read              (mm_interconnect_0_nios2_processor_debug_mem_slave_read),        //                                            .read
